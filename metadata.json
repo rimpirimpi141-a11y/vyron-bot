@@ -1,0 +1,6 @@
+{
+  "name": "Master Business Telegram Bot",
+  "description": "Production multi-purpose Telegram business automation bot with webhook support, catalog, services, earning opportunities, orders, payments, support, and admin control.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

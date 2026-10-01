@@ -1,0 +1,265 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Telegram bot registered customer profile",
+      "type": "object",
+      "properties": {
+        "telegram_id": { "type": "string" },
+        "username": { "type": "string" },
+        "first_name": { "type": "string" },
+        "withdrawable_balance": { "type": "number" },
+        "referral_count": { "type": "number" },
+        "is_blocked": { "type": "boolean" },
+        "joined_at": { "type": "string" },
+        "last_active_at": { "type": "string" }
+      },
+      "required": ["telegram_id"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Bot administrative user",
+      "type": "object",
+      "properties": {
+        "telegram_id": { "type": "string" },
+        "role": { "type": "string" },
+        "added_by": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["telegram_id", "role"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "E-commerce digital or physical product item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string" },
+        "stock": { "type": "number" },
+        "is_unlimited": { "type": "boolean" },
+        "is_active": { "type": "boolean" }
+      },
+      "required": ["name", "price"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Professional business service item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "estimated_delivery": { "type": "string" },
+        "is_active": { "type": "boolean" }
+      },
+      "required": ["name", "price"]
+    },
+    "EarningOpportunity": {
+      "title": "EarningOpportunity",
+      "description": "Affiliate or commission program guide",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "commission_rate": { "type": "string" },
+        "is_active": { "type": "boolean" }
+      },
+      "required": ["title"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "order_number": { "type": "string" },
+        "user_telegram_id": { "type": "string" },
+        "item_type": { "type": "string" },
+        "item_id": { "type": "string" },
+        "item_name": { "type": "string" },
+        "base_amount": { "type": "number" },
+        "discount_amount": { "type": "number" },
+        "final_amount": { "type": "number" },
+        "coupon_code": { "type": "string" },
+        "status": { "type": "string" },
+        "payment_proof_file_id": { "type": "string" },
+        "utr_number": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["order_number", "user_telegram_id", "status"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Manual UPI payment verification record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "order_id": { "type": "string" },
+        "order_number": { "type": "string" },
+        "user_telegram_id": { "type": "string" },
+        "amount": { "type": "number" },
+        "utr_number": { "type": "string" },
+        "proof_file_id": { "type": "string" },
+        "status": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["order_id", "status"]
+    },
+    "Coupon": {
+      "title": "Coupon",
+      "description": "Discount coupon voucher",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "discount_type": { "type": "string" },
+        "discount_value": { "type": "number" },
+        "is_active": { "type": "boolean" }
+      },
+      "required": ["code"]
+    },
+    "SupportTicket": {
+      "title": "SupportTicket",
+      "description": "Customer support thread",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "ticket_number": { "type": "string" },
+        "user_telegram_id": { "type": "string" },
+        "subject": { "type": "string" },
+        "status": { "type": "string" },
+        "messages": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["ticket_number", "user_telegram_id"]
+    },
+    "ForceChannel": {
+      "title": "ForceChannel",
+      "description": "Mandatory join channel requirement",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "channel_id": { "type": "string" },
+        "channel_name": { "type": "string" },
+        "invite_link": { "type": "string" },
+        "is_active": { "type": "boolean" }
+      },
+      "required": ["channel_id"]
+    },
+    "Referral": {
+      "title": "Referral",
+      "description": "Affiliate referral event or commission log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "referrer_id": { "type": "string" },
+        "referred_id": { "type": "string" },
+        "type": { "type": "string" },
+        "amount": { "type": "number" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["referrer_id", "referred_id"]
+    },
+    "Withdrawal": {
+      "title": "Withdrawal",
+      "description": "Referral balance payout request",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "user_telegram_id": { "type": "string" },
+        "user_name": { "type": "string" },
+        "amount": { "type": "number" },
+        "payment_details": { "type": "string" },
+        "status": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["user_telegram_id", "amount", "status"]
+    },
+    "ProcessedUpdate": {
+      "title": "ProcessedUpdate",
+      "description": "Deduplication tracker for Telegram update IDs",
+      "type": "object",
+      "properties": {
+        "update_id": { "type": "number" },
+        "processed_at": { "type": "string" }
+      },
+      "required": ["update_id"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "Bot configuration key-values",
+      "type": "object",
+      "properties": {
+        "key": { "type": "string" },
+        "value": { "type": "string" }
+      },
+      "required": ["key"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Customer accounts"
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Admin users"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Digital/physical products catalog"
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Professional services catalog"
+    },
+    "/earning_opportunities/{oppId}": {
+      "schema": "EarningOpportunity",
+      "description": "Earning and referral guides"
+    },
+    "/coupons/{couponId}": {
+      "schema": "Coupon",
+      "description": "Discount voucher codes"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer purchase orders"
+    },
+    "/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Payment verification transactions"
+    },
+    "/support_tickets/{ticketId}": {
+      "schema": "SupportTicket",
+      "description": "Customer support tickets"
+    },
+    "/force_channels/{channelId}": {
+      "schema": "ForceChannel",
+      "description": "Required Telegram channels"
+    },
+    "/referrals/{refId}": {
+      "schema": "Referral",
+      "description": "Referral logs and commissions"
+    },
+    "/withdrawals/{withdrawalId}": {
+      "schema": "Withdrawal",
+      "description": "Affiliate payout requests"
+    },
+    "/processed_updates/{updateId}": {
+      "schema": "ProcessedUpdate",
+      "description": "Telegram update deduplication store"
+    },
+    "/settings/{settingId}": {
+      "schema": "Setting",
+      "description": "Bot operational settings"
+    },
+    "/_test_connection/{id}": {
+      "schema": "Setting",
+      "description": "Health check ping document"
+    }
+  }
+}

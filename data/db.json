@@ -1,0 +1,1600 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "telegram_id": "111222333",
+      "username": "test_buyer",
+      "first_name": "Alice",
+      "is_blocked": false,
+      "joined_at": "2026-10-01T06:39:50.798Z",
+      "last_active_at": "2026-10-01T12:30:06.063Z"
+    },
+    {
+      "id": 2,
+      "telegram_id": "8838351233",
+      "username": "Aaditya334356",
+      "first_name": "Aaditya",
+      "is_blocked": false,
+      "joined_at": "2026-10-01T07:02:11.484Z",
+      "last_active_at": "2026-10-01T12:24:35.676Z"
+    },
+    {
+      "id": 3,
+      "telegram_id": "8962632792",
+      "username": "SRGAMER96",
+      "first_name": "ᏕᏒ_ᎶᏗᎷᏋᏒ96",
+      "is_blocked": false,
+      "joined_at": "2026-10-01T07:07:24.603Z",
+      "last_active_at": "2026-10-01T09:55:48.103Z"
+    },
+    {
+      "id": 4,
+      "telegram_id": "7148009296",
+      "username": "ownertnx",
+      "first_name": "@OWNERTNX",
+      "is_blocked": false,
+      "joined_at": "2026-10-01T07:40:48.874Z",
+      "last_active_at": "2026-10-01T07:42:50.414Z"
+    },
+    {
+      "id": 5,
+      "telegram_id": "8670903515",
+      "username": "Aarav0677",
+      "first_name": "Aarav",
+      "is_blocked": false,
+      "joined_at": "2026-10-01T07:42:34.834Z",
+      "last_active_at": "2026-10-01T09:38:15.482Z"
+    },
+    {
+      "id": 6,
+      "telegram_id": "8419156452",
+      "username": "",
+      "first_name": "Gaurav",
+      "is_blocked": false,
+      "joined_at": "2026-10-01T08:51:37.617Z",
+      "last_active_at": "2026-10-01T10:06:39.263Z"
+    },
+    {
+      "id": 7,
+      "telegram_id": "1497891007",
+      "username": "dhruvkumar8",
+      "first_name": "Dhruv",
+      "is_blocked": false,
+      "joined_at": "2026-10-01T09:20:59.806Z",
+      "last_active_at": "2026-10-01T09:20:59.806Z"
+    },
+    {
+      "id": 8,
+      "telegram_id": "9990001111",
+      "username": "alice_test",
+      "first_name": "Alice",
+      "is_blocked": false,
+      "referred_by": null,
+      "wallet_balance": 306,
+      "withdrawable_balance": 156,
+      "total_earned": 306,
+      "referral_count": 3,
+      "referral_reward_paid": false,
+      "joined_at": "2026-10-01T09:23:31.173Z",
+      "last_active_at": "2026-10-01T12:30:17.954Z"
+    },
+    {
+      "id": 9,
+      "telegram_id": "9990002222",
+      "username": "bob_test",
+      "first_name": "Bob",
+      "is_blocked": false,
+      "referred_by": null,
+      "wallet_balance": 0,
+      "withdrawable_balance": 0,
+      "total_earned": 0,
+      "referral_count": 0,
+      "referral_reward_paid": false,
+      "joined_at": "2026-10-01T09:23:31.174Z",
+      "last_active_at": "2026-10-01T12:30:17.937Z"
+    },
+    {
+      "id": 10,
+      "telegram_id": "9990003333",
+      "username": "",
+      "first_name": "",
+      "is_blocked": false,
+      "referred_by": "9990001111",
+      "wallet_balance": 0,
+      "withdrawable_balance": 0,
+      "total_earned": 0,
+      "referral_count": 0,
+      "referral_reward_paid": true,
+      "joined_at": "2026-10-01T09:24:02.086Z",
+      "last_active_at": "2026-10-01T09:24:02.086Z"
+    },
+    {
+      "id": 11,
+      "telegram_id": "7758344665",
+      "username": "PRATEEKDEAL",
+      "first_name": "×͜× PRATEEKDEAL ×͜×",
+      "is_blocked": false,
+      "referred_by": null,
+      "wallet_balance": 0,
+      "withdrawable_balance": 0,
+      "total_earned": 0,
+      "referral_count": 0,
+      "referral_reward_paid": false,
+      "joined_at": "2026-10-01T09:37:36.062Z",
+      "last_active_at": "2026-10-01T09:38:31.069Z"
+    },
+    {
+      "id": 12,
+      "telegram_id": "8136817432",
+      "username": "AURABGMI2",
+      "first_name": "AURABGMI",
+      "is_blocked": false,
+      "referred_by": null,
+      "wallet_balance": 0,
+      "withdrawable_balance": 0,
+      "total_earned": 0,
+      "referral_count": 0,
+      "referral_reward_paid": false,
+      "joined_at": "2026-10-01T10:15:41.266Z",
+      "last_active_at": "2026-10-01T10:15:41.266Z"
+    },
+    {
+      "id": 13,
+      "telegram_id": "ref_user_1790849998723",
+      "username": "",
+      "first_name": "",
+      "is_blocked": false,
+      "referred_by": "9990001111",
+      "wallet_balance": 0,
+      "withdrawable_balance": 0,
+      "total_earned": 0,
+      "referral_count": 0,
+      "referral_reward_paid": true,
+      "joined_at": "2026-10-01T10:19:58.724Z",
+      "last_active_at": "2026-10-01T10:19:58.724Z"
+    },
+    {
+      "id": 14,
+      "telegram_id": "7051212165",
+      "username": "",
+      "first_name": "Raistar",
+      "is_blocked": false,
+      "referred_by": null,
+      "wallet_balance": 0,
+      "withdrawable_balance": 0,
+      "total_earned": 0,
+      "referral_count": 0,
+      "referral_reward_paid": false,
+      "joined_at": "2026-10-01T12:24:53.009Z",
+      "last_active_at": "2026-10-01T12:24:53.009Z"
+    },
+    {
+      "id": 15,
+      "telegram_id": "ref_user_1790857817951",
+      "username": "",
+      "first_name": "",
+      "is_blocked": false,
+      "referred_by": "9990001111",
+      "wallet_balance": 0,
+      "withdrawable_balance": 0,
+      "total_earned": 0,
+      "referral_count": 0,
+      "referral_reward_paid": true,
+      "joined_at": "2026-10-01T12:30:17.951Z",
+      "last_active_at": "2026-10-01T12:30:17.951Z"
+    }
+  ],
+  "admins": [
+    {
+      "telegram_id": "999888777",
+      "username": "SuperAdmin",
+      "role": "super_admin",
+      "permissions": [
+        "*"
+      ],
+      "added_at": "2026-10-01T06:39:50.797Z",
+      "added_by": "system"
+    },
+    {
+      "telegram_id": "8974854325:AAEUad-qPqnzbyW78JI1bUSTrqQcfNgGf2Q",
+      "username": "SuperAdmin",
+      "role": "super_admin",
+      "permissions": [
+        "*"
+      ],
+      "added_at": "2026-10-01T06:48:32.136Z",
+      "added_by": "system"
+    },
+    {
+      "telegram_id": "8838351233",
+      "username": "SuperAdmin",
+      "role": "super_admin",
+      "permissions": [
+        "*"
+      ],
+      "added_at": "2026-10-01T06:51:30.708Z",
+      "added_by": "system"
+    }
+  ],
+  "products": [
+    {
+      "id": "prod_1790836790795",
+      "name": "VIP Business E-Book & Toolkit",
+      "description": "Complete step-by-step business automation blueprint + downloadable resource pack.",
+      "price": 499,
+      "type": "digital",
+      "stock": 0,
+      "is_unlimited": true,
+      "delivery_info": "Instant download link sent automatically upon payment confirmation.",
+      "image_url": "",
+      "is_active": true,
+      "created_at": "2026-10-01T06:39:50.795Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 50,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790836790799",
+      "created_at": "2026-10-01T06:39:50.799Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 50,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790837490711",
+      "created_at": "2026-10-01T06:51:30.711Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 50,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790837499950",
+      "created_at": "2026-10-01T06:51:39.951Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 49,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790837520882",
+      "created_at": "2026-10-01T06:52:00.882Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 50,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790838449688",
+      "created_at": "2026-10-01T07:07:29.688Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 50,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790839546363",
+      "created_at": "2026-10-01T07:25:46.363Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 50,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790840275625",
+      "created_at": "2026-10-01T07:37:55.625Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 50,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790844052418",
+      "created_at": "2026-10-01T08:40:52.418Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 50,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790846716740",
+      "created_at": "2026-10-01T09:25:16.740Z"
+    },
+    {
+      "name": "Automation Mastery Video Course",
+      "description": "10 hours of high-definition video lessons",
+      "price": 999,
+      "type": "digital",
+      "stock": 50,
+      "is_unlimited": false,
+      "delivery_info": "Member portal access link sent immediately",
+      "is_active": true,
+      "id": "prod_1790857806067",
+      "created_at": "2026-10-01T12:30:06.067Z"
+    }
+  ],
+  "services": [
+    {
+      "id": "srv_1790836790796",
+      "name": "Custom Telegram Bot Setup & Deployment",
+      "description": "Full bot architecture, webhook setup, and custom feature integration done for you.",
+      "price": 2499,
+      "delivery_time": "24-48 Hours",
+      "requirements": "Please provide your BotFather token, business name, and catalog details.",
+      "image_url": "",
+      "is_active": true,
+      "created_at": "2026-10-01T06:39:50.796Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790836790799",
+      "created_at": "2026-10-01T06:39:50.799Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790837490712",
+      "created_at": "2026-10-01T06:51:30.712Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790837499951",
+      "created_at": "2026-10-01T06:51:39.951Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790837520882",
+      "created_at": "2026-10-01T06:52:00.882Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790838449688",
+      "created_at": "2026-10-01T07:07:29.688Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790839546363",
+      "created_at": "2026-10-01T07:25:46.363Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790840275625",
+      "created_at": "2026-10-01T07:37:55.625Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790844052419",
+      "created_at": "2026-10-01T08:40:52.419Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790846716741",
+      "created_at": "2026-10-01T09:25:16.741Z"
+    },
+    {
+      "name": "Website Speed Optimization",
+      "description": "We boost your site Google PageSpeed score to 90+",
+      "price": 1999,
+      "delivery_time": "24 Hours",
+      "requirements": "WordPress/Shopify admin credentials",
+      "is_active": true,
+      "id": "srv_1790857806068",
+      "created_at": "2026-10-01T12:30:06.068Z"
+    }
+  ],
+  "earning_opportunities": [
+    {
+      "id": "earn_1790836790796",
+      "name": "Affiliate Partner Program",
+      "description": "Earn generous 25% commissions for every customer who buys our products or services.",
+      "reward_info": "Earn 25% lifetime commission on referred orders.",
+      "how_to_earn": "1. Share your custom referral link.\n2. When your referral completes a purchase, your wallet credits automatically.\n3. Request payout anytime to UPI or Crypto.",
+      "external_url": "https://telegram.org",
+      "referral_info": "Contact @Support to receive your unique tracked partner banner and affiliate ID.",
+      "terms": "Fair usage only. Self-referrals are strictly prohibited and will result in account forfeiture.",
+      "image_url": "",
+      "is_active": true,
+      "created_at": "2026-10-01T06:39:50.797Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790836790799",
+      "created_at": "2026-10-01T06:39:50.799Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790837490712",
+      "created_at": "2026-10-01T06:51:30.712Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790837499951",
+      "created_at": "2026-10-01T06:51:39.951Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790837520882",
+      "created_at": "2026-10-01T06:52:00.882Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790838449689",
+      "created_at": "2026-10-01T07:07:29.689Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790839546364",
+      "created_at": "2026-10-01T07:25:46.364Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790840275626",
+      "created_at": "2026-10-01T07:37:55.626Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790844052419",
+      "created_at": "2026-10-01T08:40:52.419Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790846716741",
+      "created_at": "2026-10-01T09:25:16.741Z"
+    },
+    {
+      "name": "Brand Ambassador Bounty",
+      "description": "Promote our tools on Twitter/X or YouTube",
+      "reward_info": "Earn up to ₹5000 per video mention",
+      "how_to_earn": "Submit your published link to admin",
+      "external_url": "https://example.com/bounty",
+      "referral_info": "Use custom hashtag #MasterBusiness",
+      "terms": "Minimum 500 impressions required",
+      "is_active": true,
+      "id": "earn_1790857806069",
+      "created_at": "2026-10-01T12:30:06.069Z"
+    }
+  ],
+  "coupons": [
+    {
+      "code": "WELCOME20",
+      "description": "20% Welcome Discount on your first order",
+      "discount_type": "percent",
+      "discount_value": 20,
+      "expiry_date": null,
+      "usage_limit": 1000,
+      "times_used": 1,
+      "applicable_to": "all",
+      "is_active": true,
+      "created_at": "2026-10-01T06:39:50.797Z"
+    }
+  ],
+  "orders": [
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790836790799",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790836790800",
+      "order_number": "MB-08009852",
+      "created_at": "2026-10-01T06:39:50.800Z",
+      "updated_at": "2026-10-01T06:39:50.800Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790837490711",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790837490712",
+      "order_number": "MB-07122496",
+      "created_at": "2026-10-01T06:51:30.712Z",
+      "updated_at": "2026-10-01T06:51:30.713Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790837499950",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790837499952",
+      "order_number": "MB-99529663",
+      "created_at": "2026-10-01T06:51:39.952Z",
+      "updated_at": "2026-10-01T06:51:39.953Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790837520882",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790837520883",
+      "order_number": "MB-08838254",
+      "created_at": "2026-10-01T06:52:00.883Z",
+      "updated_at": "2026-10-01T06:52:00.884Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790838449688",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790838449689",
+      "order_number": "MB-96896850",
+      "created_at": "2026-10-01T07:07:29.689Z",
+      "updated_at": "2026-10-01T07:07:29.690Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790839546363",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790839546364",
+      "order_number": "MB-63649427",
+      "created_at": "2026-10-01T07:25:46.364Z",
+      "updated_at": "2026-10-01T07:25:46.366Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790840275625",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790840275626",
+      "order_number": "MB-56263832",
+      "created_at": "2026-10-01T07:37:55.626Z",
+      "updated_at": "2026-10-01T07:37:55.627Z"
+    },
+    {
+      "user_telegram_id": 8670903515,
+      "user_name": "Aarav",
+      "item_type": "product",
+      "item_id": "prod_1790836790795",
+      "item_name": "VIP Business E-Book & Toolkit",
+      "original_amount": 499,
+      "discount": 0,
+      "final_amount": 499,
+      "status": "cancelled",
+      "delivery_info": "Instant download link sent automatically upon payment confirmation.",
+      "id": "ord_1790841757715",
+      "order_number": "MB-77151918",
+      "created_at": "2026-10-01T08:02:37.716Z",
+      "updated_at": "2026-10-01T08:02:40.985Z"
+    },
+    {
+      "user_telegram_id": 8670903515,
+      "user_name": "Aarav",
+      "item_type": "product",
+      "item_id": "prod_1790837520882",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 200,
+      "final_amount": 799,
+      "status": "completed",
+      "delivery_info": "Member portal access link sent immediately",
+      "id": "ord_1790841778383",
+      "order_number": "MB-83836844",
+      "created_at": "2026-10-01T08:03:06.824Z",
+      "updated_at": "2026-10-01T08:05:23.081Z"
+    },
+    {
+      "user_telegram_id": 8670903515,
+      "user_name": "Aarav",
+      "item_type": "product",
+      "item_id": "prod_1790837520882",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 200,
+      "final_amount": 799,
+      "status": "completed",
+      "delivery_info": "Member portal access link sent immediately",
+      "id": "ord_1790841778383",
+      "order_number": "MB-83836844",
+      "created_at": "2026-10-01T08:03:06.824Z",
+      "updated_at": "2026-10-01T08:05:23.081Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790844052418",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790844052420",
+      "order_number": "MB-24201120",
+      "created_at": "2026-10-01T08:40:52.420Z",
+      "updated_at": "2026-10-01T08:40:52.421Z"
+    },
+    {
+      "user_telegram_id": 9990003333,
+      "user_name": "Charlie",
+      "item_type": "product",
+      "item_id": "prod_test",
+      "item_name": "Automation Course",
+      "original_amount": 1000,
+      "discount": 0,
+      "final_amount": 1000,
+      "status": "completed",
+      "id": "ord_1790846642087",
+      "order_number": "MB-20877736",
+      "created_at": "2026-10-01T09:24:02.087Z",
+      "updated_at": "2026-10-01T09:24:02.087Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790846716740",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790846716742",
+      "order_number": "MB-67428886",
+      "created_at": "2026-10-01T09:25:16.742Z",
+      "updated_at": "2026-10-01T09:25:16.743Z"
+    },
+    {
+      "user_telegram_id": "ref_user_1790849998723",
+      "user_name": "Charlie",
+      "item_type": "product",
+      "item_id": "prod_test",
+      "item_name": "Automation Course",
+      "original_amount": 1000,
+      "discount": 0,
+      "final_amount": 1000,
+      "status": "completed",
+      "id": "ord_1790849998725",
+      "order_number": "MB-87257587",
+      "created_at": "2026-10-01T10:19:58.725Z",
+      "updated_at": "2026-10-01T10:19:58.725Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "item_type": "product",
+      "item_id": "prod_1790857806067",
+      "item_name": "Automation Mastery Video Course",
+      "original_amount": 999,
+      "discount": 0,
+      "final_amount": 999,
+      "status": "completed",
+      "id": "ord_1790857806072",
+      "order_number": "MB-60722305",
+      "created_at": "2026-10-01T12:30:06.072Z",
+      "updated_at": "2026-10-01T12:30:06.074Z"
+    },
+    {
+      "user_telegram_id": "ref_user_1790857817951",
+      "user_name": "Charlie",
+      "item_type": "product",
+      "item_id": "prod_test",
+      "item_name": "Automation Course",
+      "original_amount": 1000,
+      "discount": 0,
+      "final_amount": 1000,
+      "status": "completed",
+      "id": "ord_1790857817952",
+      "order_number": "MB-79525066",
+      "created_at": "2026-10-01T12:30:17.952Z",
+      "updated_at": "2026-10-01T12:30:17.952Z"
+    }
+  ],
+  "payments": [
+    {
+      "order_id": "ord_1790836790800",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790836790800",
+      "created_at": "2026-10-01T06:39:50.800Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T06:39:50.800Z"
+    },
+    {
+      "order_id": "ord_1790837490712",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790837490713",
+      "created_at": "2026-10-01T06:51:30.713Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T06:51:30.713Z"
+    },
+    {
+      "order_id": "ord_1790837499952",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790837499952",
+      "created_at": "2026-10-01T06:51:39.952Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T06:51:39.953Z"
+    },
+    {
+      "order_id": "ord_1790837520883",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790837520883",
+      "created_at": "2026-10-01T06:52:00.883Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T06:52:00.884Z"
+    },
+    {
+      "order_id": "ord_1790838449689",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790838449690",
+      "created_at": "2026-10-01T07:07:29.690Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T07:07:29.690Z"
+    },
+    {
+      "order_id": "ord_1790839546364",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790839546365",
+      "created_at": "2026-10-01T07:25:46.365Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T07:25:46.365Z"
+    },
+    {
+      "order_id": "ord_1790840275626",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790840275627",
+      "created_at": "2026-10-01T07:37:55.627Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T07:37:55.627Z"
+    },
+    {
+      "order_id": "ord_1790841778383",
+      "user_telegram_id": 8670903515,
+      "transaction_id": "Photo Attachment",
+      "proof_file_id": "AgACAgUAAxkBAAOOar4T0TCDhDcXvRQwezqiInRzM4gAAvASaxsKHvBVewdhJ9OIg_gBAAMCAAN3AAM9BA",
+      "status": "rejected",
+      "amount": 799,
+      "id": "pay_1790841809571",
+      "created_at": "2026-10-01T08:03:29.571Z",
+      "admin_note": "",
+      "reviewed_at": "2026-10-01T08:05:24.554Z"
+    },
+    {
+      "order_id": "ord_1790844052420",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790844052420",
+      "created_at": "2026-10-01T08:40:52.420Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T08:40:52.421Z"
+    },
+    {
+      "order_id": "ord_1790846716742",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790846716742",
+      "created_at": "2026-10-01T09:25:16.742Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T09:25:16.743Z"
+    },
+    {
+      "order_id": "ord_1790857806072",
+      "user_telegram_id": "111222333",
+      "transaction_id": "UTR998877665544",
+      "proof_file_id": "test_file_id_receipt",
+      "status": "approved",
+      "amount": 999,
+      "id": "pay_1790857806073",
+      "created_at": "2026-10-01T12:30:06.073Z",
+      "admin_note": "Verified in bank account",
+      "reviewed_at": "2026-10-01T12:30:06.073Z"
+    }
+  ],
+  "support_tickets": [
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "subject": "Question regarding video course access",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Where do I find the login link?",
+          "timestamp": "2026-10-01T06:39:50.801Z"
+        },
+        {
+          "sender": "admin",
+          "text": "We have updated your delivery notes with the login portal.",
+          "timestamp": "2026-10-01T06:39:50.801Z"
+        }
+      ],
+      "id": "tkt_1790836790801",
+      "ticket_number": "TKT-91565",
+      "status": "answered",
+      "created_at": "2026-10-01T06:39:50.801Z",
+      "updated_at": "2026-10-01T06:39:50.801Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "subject": "Question regarding video course access",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Where do I find the login link?",
+          "timestamp": "2026-10-01T06:51:39.954Z"
+        },
+        {
+          "sender": "admin",
+          "text": "We have updated your delivery notes with the login portal.",
+          "timestamp": "2026-10-01T06:51:39.954Z"
+        }
+      ],
+      "id": "tkt_1790837499954",
+      "ticket_number": "TKT-12714",
+      "status": "answered",
+      "created_at": "2026-10-01T06:51:39.954Z",
+      "updated_at": "2026-10-01T06:51:39.954Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "subject": "Question regarding video course access",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Where do I find the login link?",
+          "timestamp": "2026-10-01T06:52:00.884Z"
+        },
+        {
+          "sender": "admin",
+          "text": "We have updated your delivery notes with the login portal.",
+          "timestamp": "2026-10-01T06:52:00.885Z"
+        }
+      ],
+      "id": "tkt_1790837520884",
+      "ticket_number": "TKT-94370",
+      "status": "answered",
+      "created_at": "2026-10-01T06:52:00.884Z",
+      "updated_at": "2026-10-01T06:52:00.885Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "subject": "Question regarding video course access",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Where do I find the login link?",
+          "timestamp": "2026-10-01T07:07:29.691Z"
+        },
+        {
+          "sender": "admin",
+          "text": "We have updated your delivery notes with the login portal.",
+          "timestamp": "2026-10-01T07:07:29.692Z"
+        }
+      ],
+      "id": "tkt_1790838449691",
+      "ticket_number": "TKT-33927",
+      "status": "answered",
+      "created_at": "2026-10-01T07:07:29.691Z",
+      "updated_at": "2026-10-01T07:07:29.692Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "subject": "Question regarding video course access",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Where do I find the login link?",
+          "timestamp": "2026-10-01T07:25:46.366Z"
+        },
+        {
+          "sender": "admin",
+          "text": "We have updated your delivery notes with the login portal.",
+          "timestamp": "2026-10-01T07:25:46.367Z"
+        }
+      ],
+      "id": "tkt_1790839546366",
+      "ticket_number": "TKT-57759",
+      "status": "answered",
+      "created_at": "2026-10-01T07:25:46.366Z",
+      "updated_at": "2026-10-01T07:25:46.367Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "subject": "Question regarding video course access",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Where do I find the login link?",
+          "timestamp": "2026-10-01T07:37:55.628Z"
+        },
+        {
+          "sender": "admin",
+          "text": "We have updated your delivery notes with the login portal.",
+          "timestamp": "2026-10-01T07:37:55.628Z"
+        }
+      ],
+      "id": "tkt_1790840275628",
+      "ticket_number": "TKT-78619",
+      "status": "answered",
+      "created_at": "2026-10-01T07:37:55.628Z",
+      "updated_at": "2026-10-01T07:37:55.628Z"
+    },
+    {
+      "user_telegram_id": 8670903515,
+      "user_name": "Aarav",
+      "subject": "Hyyy",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "How are you?\n\nAhkamama\n\n\nSjjsmammakka\n\n\nHahajnama",
+          "timestamp": "2026-10-01T07:43:14.200Z"
+        }
+      ],
+      "id": "tkt_1790840594200",
+      "ticket_number": "TKT-99087",
+      "status": "closed",
+      "created_at": "2026-10-01T07:43:14.200Z",
+      "updated_at": "2026-10-01T07:44:35.375Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "subject": "Question regarding video course access",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Where do I find the login link?",
+          "timestamp": "2026-10-01T08:40:52.422Z"
+        },
+        {
+          "sender": "admin",
+          "text": "We have updated your delivery notes with the login portal.",
+          "timestamp": "2026-10-01T08:40:52.423Z"
+        }
+      ],
+      "id": "tkt_1790844052422",
+      "ticket_number": "TKT-44042",
+      "status": "answered",
+      "created_at": "2026-10-01T08:40:52.422Z",
+      "updated_at": "2026-10-01T08:40:52.423Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "subject": "Question regarding video course access",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Where do I find the login link?",
+          "timestamp": "2026-10-01T09:25:16.744Z"
+        },
+        {
+          "sender": "admin",
+          "text": "We have updated your delivery notes with the login portal.",
+          "timestamp": "2026-10-01T09:25:16.744Z"
+        }
+      ],
+      "id": "tkt_1790846716744",
+      "ticket_number": "TKT-79656",
+      "status": "answered",
+      "created_at": "2026-10-01T09:25:16.744Z",
+      "updated_at": "2026-10-01T09:25:16.744Z"
+    },
+    {
+      "user_telegram_id": 8962632792,
+      "user_name": "ᏕᏒ_ᎶᏗᎷᏋᏒ96",
+      "subject": "Please Help",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Please Help",
+          "timestamp": "2026-10-01T09:56:43.165Z"
+        }
+      ],
+      "id": "tkt_1790848603165",
+      "ticket_number": "TKT-24521",
+      "status": "open",
+      "created_at": "2026-10-01T09:56:43.165Z",
+      "updated_at": "2026-10-01T09:56:43.165Z"
+    },
+    {
+      "user_telegram_id": "111222333",
+      "user_name": "Alice",
+      "subject": "Question regarding video course access",
+      "messages": [
+        {
+          "sender": "user",
+          "text": "Where do I find the login link?",
+          "timestamp": "2026-10-01T12:30:06.075Z"
+        },
+        {
+          "sender": "admin",
+          "text": "We have updated your delivery notes with the login portal.",
+          "timestamp": "2026-10-01T12:30:06.076Z"
+        }
+      ],
+      "id": "tkt_1790857806075",
+      "ticket_number": "TKT-48814",
+      "status": "answered",
+      "created_at": "2026-10-01T12:30:06.075Z",
+      "updated_at": "2026-10-01T12:30:06.076Z"
+    }
+  ],
+  "processed_updates": [
+    {
+      "update_id": 88776655,
+      "processed_at": "2026-10-01T06:39:50.802Z"
+    },
+    {
+      "update_id": 12345678,
+      "processed_at": "2026-10-01T06:40:19.650Z"
+    },
+    {
+      "update_id": 1790837520886,
+      "processed_at": "2026-10-01T06:52:00.886Z"
+    },
+    {
+      "update_id": 1790838449694,
+      "processed_at": "2026-10-01T07:07:29.694Z"
+    },
+    {
+      "update_id": 1790839546368,
+      "processed_at": "2026-10-01T07:25:46.368Z"
+    },
+    {
+      "update_id": 1790840275629,
+      "processed_at": "2026-10-01T07:37:55.630Z"
+    },
+    {
+      "update_id": 1790844052425,
+      "processed_at": "2026-10-01T08:40:52.425Z"
+    },
+    {
+      "update_id": 1790846716746,
+      "processed_at": "2026-10-01T09:25:16.746Z"
+    },
+    {
+      "update_id": 99887766,
+      "processed_at": "2026-10-01T12:29:47.859Z"
+    },
+    {
+      "update_id": 1790857806078,
+      "processed_at": "2026-10-01T12:30:06.078Z"
+    }
+  ],
+  "settings": {
+    "upi_id": "business@upi",
+    "receiver_name": "Master Business Automation",
+    "payment_instructions": "1. Scan the QR or pay to UPI ID\n2. Note your 12-digit UTR/Txn ID\n3. Upload screenshot/UTR below",
+    "qr_image_file_id": "",
+    "currency": "INR",
+    "about_text": "Welcome to Master Business Bot! Your all-in-one platform for high quality digital/physical products, professional business services, verified earning opportunities, and dedicated 24/7 support.",
+    "has_seeded_catalog": true,
+    "ai_enabled": true
+  },
+  "analytics_events": [
+    {
+      "id": 1,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8838351233
+      },
+      "created_at": "2026-10-01T07:02:11.486Z"
+    },
+    {
+      "id": 2,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8838351233
+      },
+      "created_at": "2026-10-01T07:02:11.923Z"
+    },
+    {
+      "id": 3,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8962632792
+      },
+      "created_at": "2026-10-01T07:07:24.604Z"
+    },
+    {
+      "id": 4,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8962632792
+      },
+      "created_at": "2026-10-01T07:07:27.294Z"
+    },
+    {
+      "id": 5,
+      "event_type": "earning_opp_viewed",
+      "metadata": {
+        "opp_id": "earn_1790836790796"
+      },
+      "created_at": "2026-10-01T07:25:13.564Z"
+    },
+    {
+      "id": 6,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8838351233
+      },
+      "created_at": "2026-10-01T07:26:21.270Z"
+    },
+    {
+      "id": 7,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 7148009296
+      },
+      "created_at": "2026-10-01T07:40:48.875Z"
+    },
+    {
+      "id": 8,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8670903515
+      },
+      "created_at": "2026-10-01T07:42:34.834Z"
+    },
+    {
+      "id": 9,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 7148009296
+      },
+      "created_at": "2026-10-01T07:42:50.414Z"
+    },
+    {
+      "id": 10,
+      "event_type": "product_order_created",
+      "metadata": {
+        "order_id": "ord_1790841757715",
+        "product_id": "prod_1790836790795"
+      },
+      "created_at": "2026-10-01T08:02:37.716Z"
+    },
+    {
+      "id": 11,
+      "event_type": "product_order_created",
+      "metadata": {
+        "order_id": "ord_1790841778383",
+        "product_id": "prod_1790837520882"
+      },
+      "created_at": "2026-10-01T08:02:58.384Z"
+    },
+    {
+      "id": 12,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8419156452
+      },
+      "created_at": "2026-10-01T08:51:37.618Z"
+    },
+    {
+      "id": 13,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 1497891007
+      },
+      "created_at": "2026-10-01T09:20:59.807Z"
+    },
+    {
+      "id": 14,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 7758344665
+      },
+      "created_at": "2026-10-01T09:37:36.063Z"
+    },
+    {
+      "id": 15,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8670903515
+      },
+      "created_at": "2026-10-01T09:38:15.483Z"
+    },
+    {
+      "id": 16,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 7758344665
+      },
+      "created_at": "2026-10-01T09:38:31.070Z"
+    },
+    {
+      "id": 17,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8962632792
+      },
+      "created_at": "2026-10-01T09:55:42.111Z"
+    },
+    {
+      "id": 18,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8838351233
+      },
+      "created_at": "2026-10-01T09:55:44.389Z"
+    },
+    {
+      "id": 19,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8962632792
+      },
+      "created_at": "2026-10-01T09:55:48.104Z"
+    },
+    {
+      "id": 20,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8838351233
+      },
+      "created_at": "2026-10-01T10:01:39.432Z"
+    },
+    {
+      "id": 21,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8419156452
+      },
+      "created_at": "2026-10-01T10:06:39.264Z"
+    },
+    {
+      "id": 22,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8136817432
+      },
+      "created_at": "2026-10-01T10:15:41.266Z"
+    },
+    {
+      "id": 23,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8838351233
+      },
+      "created_at": "2026-10-01T12:22:44.474Z"
+    },
+    {
+      "id": 24,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8838351233
+      },
+      "created_at": "2026-10-01T12:22:45.183Z"
+    },
+    {
+      "id": 25,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 8838351233
+      },
+      "created_at": "2026-10-01T12:24:35.676Z"
+    },
+    {
+      "id": 26,
+      "event_type": "user_start",
+      "metadata": {
+        "telegram_id": 7051212165
+      },
+      "created_at": "2026-10-01T12:24:53.010Z"
+    }
+  ],
+  "referrals": [
+    {
+      "id": "ref_1790846642087_772",
+      "referrer_id": "9990001111",
+      "referred_id": "9990003333",
+      "referred_name": "Charlie",
+      "type": "join",
+      "amount": 2,
+      "created_at": "2026-10-01T09:24:02.087Z"
+    },
+    {
+      "id": "ref_comm_1790846642088_3",
+      "referrer_id": "9990001111",
+      "referred_id": "9990003333",
+      "referred_name": "",
+      "type": "commission",
+      "amount": 100,
+      "order_id": "ord_1790846642087",
+      "order_number": "MB-20877736",
+      "created_at": "2026-10-01T09:24:02.088Z"
+    },
+    {
+      "id": "ref_1790849998724_732",
+      "referrer_id": "9990001111",
+      "referred_id": "ref_user_1790849998723",
+      "referred_name": "Charlie",
+      "type": "join",
+      "amount": 2,
+      "created_at": "2026-10-01T10:19:58.724Z"
+    },
+    {
+      "id": "ref_comm_1790849998726_753",
+      "referrer_id": "9990001111",
+      "referred_id": "ref_user_1790849998723",
+      "referred_name": "",
+      "type": "commission",
+      "amount": 100,
+      "order_id": "ord_1790849998725",
+      "order_number": "MB-87257587",
+      "created_at": "2026-10-01T10:19:58.726Z"
+    },
+    {
+      "id": "ref_1790857817952_557",
+      "referrer_id": "9990001111",
+      "referred_id": "ref_user_1790857817951",
+      "referred_name": "Charlie",
+      "type": "join",
+      "amount": 2,
+      "created_at": "2026-10-01T12:30:17.952Z"
+    },
+    {
+      "id": "ref_comm_1790857817953_618",
+      "referrer_id": "9990001111",
+      "referred_id": "ref_user_1790857817951",
+      "referred_name": "",
+      "type": "commission",
+      "amount": 100,
+      "order_id": "ord_1790857817952",
+      "order_number": "MB-79525066",
+      "created_at": "2026-10-01T12:30:17.953Z"
+    }
+  ],
+  "withdrawals": [
+    {
+      "id": "wth_1790846642089_944",
+      "user_telegram_id": "9990001111",
+      "user_name": "Alice",
+      "amount": 50,
+      "payment_details": "alice@okaxis",
+      "status": "paid",
+      "admin_reason": "",
+      "created_at": "2026-10-01T09:24:02.089Z",
+      "reviewed_at": "2026-10-01T09:24:02.090Z"
+    },
+    {
+      "id": "wth_1790849998728_845",
+      "user_telegram_id": "9990001111",
+      "user_name": "Alice",
+      "amount": 50,
+      "payment_details": "alice@okaxis",
+      "status": "paid",
+      "admin_reason": "",
+      "created_at": "2026-10-01T10:19:58.728Z",
+      "reviewed_at": "2026-10-01T10:19:58.728Z"
+    },
+    {
+      "id": "wth_1790857817955_2",
+      "user_telegram_id": "9990001111",
+      "user_name": "Alice",
+      "amount": 50,
+      "payment_details": "alice@okaxis",
+      "status": "paid",
+      "admin_reason": "",
+      "created_at": "2026-10-01T12:30:17.955Z",
+      "reviewed_at": "2026-10-01T12:30:17.956Z"
+    }
+  ],
+  "force_channels": [
+    {
+      "channel_id": "@smartmoneyboost2",
+      "channel_name": "Redeem and Gift Loot-2.0",
+      "invite_link": "https://t.me/smartmoneyboost2",
+      "is_active": true,
+      "id": "fc_1790848957036",
+      "created_at": "2026-10-01T10:02:37.036Z"
+    }
+  ]
+}
