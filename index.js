@@ -1,10 +1,8 @@
-import express from 'express';
 import { Bot, InlineKeyboard } from 'grammy';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import http from 'http';
-import https from 'https';
 import { GoogleGenAI } from '@google/genai';
 import { initializeApp } from 'firebase/app';
 import {
@@ -23,35 +21,32 @@ import {
 dotenv.config();
 
 // ==========================================
-// 1. SAFE PROCESS CRASH-PROOFING HANDLERS
+// 1. GLOBAL PROCESS CRASH PROOFING
 // ==========================================
 process.on('uncaughtException', (err) => {
   const timestamp = new Date().toISOString();
-  console.error(`💥 [${timestamp}] [CRASH-PROOF] Uncaught Exception caught safely:`, {
-    message: err.message,
-    stack: err.stack,
-    name: err.name
+  console.error(`💥 [${timestamp}] [CRASH-PROOF] Uncaught Exception:`, {
+    name: err?.name || 'Error',
+    message: err?.message || String(err),
+    stack: err?.stack || ''
   });
 });
 
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason) => {
   const timestamp = new Date().toISOString();
   const msg = reason instanceof Error ? reason.message : String(reason);
   const stack = reason instanceof Error ? reason.stack : '';
-  console.error(`⚠️ [${timestamp}] [CRASH-PROOF] Unhandled Rejection caught safely:`, {
-    reason: msg,
-    stack
-  });
+  console.error(`⚠️ [${timestamp}] [CRASH-PROOF] Unhandled Rejection:`, { reason: msg, stack });
 });
 
 // ==========================================
-// 2. CONFIGURATION & TOKEN RESOLUTION
+// 2. CONFIGURATION RESOLUTION
 // ==========================================
 function resolveConfiguration() {
   let rawToken = process.env.TELEGRAM_BOT_TOKEN ? String(process.env.TELEGRAM_BOT_TOKEN).trim().replace(/^["']|["']$/g, '') : '';
   let rawAdminId = process.env.INITIAL_SUPER_ADMIN_ID ? String(process.env.INITIAL_SUPER_ADMIN_ID).trim().replace(/^["']|["']$/g, '') : '';
 
-  // Auto-detect if secrets were accidentally swapped in host environment
+  // Auto-detect if secrets were swapped in environment
   const isTokenFormat = (str) => /^\d{6,14}:[A-Za-z0-9_-]{25,}$/.test(str);
   const isNumericUserId = (str) => /^\d{5,14}$/.test(str);
 
@@ -62,23 +57,11 @@ function resolveConfiguration() {
     rawAdminId = temp;
   }
 
-  // Detect public base URL across various hosts (Render, Koyeb, Fly, Railway, etc.)
-  const publicUrl = (
-    process.env.APP_URL ||
-    process.env.RENDER_EXTERNAL_URL ||
-    process.env.KOYEB_PUBLIC_DOMAIN ||
-    process.env.PUBLIC_URL ||
-    ''
-  ).replace(/\/+$/, '');
-
   return {
     port: parseInt(process.env.PORT || '3000', 10),
     telegramBotToken: rawToken,
     initialSuperAdminId: rawAdminId,
-    webhookSecret: process.env.WEBHOOK_SECRET ? String(process.env.WEBHOOK_SECRET).trim() : '',
-    appUrl: publicUrl,
-    geminiApiKey: process.env.GEMINI_API_KEY || '',
-    isProduction: process.env.NODE_ENV === 'production'
+    geminiApiKey: process.env.GEMINI_API_KEY || ''
   };
 }
 
@@ -103,7 +86,6 @@ class DatabaseEngine {
       admins: null
     };
     this.cacheTtlMs = 45000;
-    this.recentProcessedUpdates = new Set();
     this.data = {
       users: [],
       admins: [],
@@ -114,9 +96,7 @@ class DatabaseEngine {
       orders: [],
       payments: [],
       support_tickets: [],
-      processed_updates: [],
       settings: {},
-      analytics_events: [],
       referrals: [],
       withdrawals: [],
       force_channels: []
@@ -126,21 +106,17 @@ class DatabaseEngine {
   async init() {
     if (this.isInitialized) return;
 
-    // Check Firebase configuration
+    // Check Firebase configuration safely with try/catch
     let rawFirebaseConfig = null;
     const configPath = path.resolve(process.cwd(), 'firebase-applet-config.json');
-    if (fs.existsSync(configPath)) {
-      try {
+    try {
+      if (fs.existsSync(configPath)) {
         rawFirebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-      } catch (e) {
-        console.warn('⚠️ Could not parse firebase-applet-config.json:', e.message);
-      }
-    } else if (process.env.FIREBASE_CONFIG) {
-      try {
+      } else if (process.env.FIREBASE_CONFIG) {
         rawFirebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG);
-      } catch (e) {
-        console.warn('⚠️ Could not parse process.env.FIREBASE_CONFIG:', e.message);
       }
+    } catch (e) {
+      console.warn('⚠️ [DB] Could not parse Firebase config:', e.message);
     }
 
     if (rawFirebaseConfig) {
@@ -148,10 +124,10 @@ class DatabaseEngine {
         console.log('🔥 [DB] Initializing Cloud Firestore...');
         const app = initializeApp(rawFirebaseConfig);
         this.firestoreDb = initializeFirestore(app, {}, rawFirebaseConfig.firestoreDatabaseId || '(default)');
-        
+
         // Ping Firestore
         const pingRef = doc(this.firestoreDb, '_system_health', 'ping');
-        await setDoc(pingRef, { timestamp: Date.now(), status: 'online' }, { merge: true });
+        await setDoc(pingRef, { timestamp: Date.now(), mode: 'long_polling' }, { merge: true });
         this.type = 'firestore';
         console.log('✅ [DB] Google Cloud Firestore connected successfully.');
       } catch (err) {
@@ -163,25 +139,30 @@ class DatabaseEngine {
       this.initFileStore();
     }
 
-    await this.seedDefaults();
+    try {
+      await this.seedDefaults();
+    } catch (seedErr) {
+      console.warn('⚠️ [DB] Seed defaults warning:', seedErr.message);
+    }
+
     this.isInitialized = true;
   }
 
   initFileStore() {
     this.type = 'file';
-    const dir = path.dirname(this.filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    if (fs.existsSync(this.filePath)) {
-      try {
+    try {
+      const dir = path.dirname(this.filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      if (fs.existsSync(this.filePath)) {
         const raw = fs.readFileSync(this.filePath, 'utf-8');
         this.data = { ...this.data, ...JSON.parse(raw) };
-      } catch (err) {
-        console.error('Error reading db.json:', err.message);
+      } else {
         this.saveFileStore();
       }
-    } else {
+    } catch (err) {
+      console.error('Error reading db.json:', err.message);
       this.saveFileStore();
     }
   }
@@ -293,54 +274,6 @@ class DatabaseEngine {
     }
   }
 
-  // --- Processed Updates Deduplication ---
-  async isUpdateProcessed(updateId) {
-    const uid = String(updateId);
-    if (this.recentProcessedUpdates.has(uid)) return true;
-    if (this.type === 'firestore') {
-      try {
-        const snap = await getDoc(doc(this.firestoreDb, 'processed_updates', uid));
-        if (snap.exists()) {
-          this.recentProcessedUpdates.add(uid);
-          return true;
-        }
-      } catch {
-        return false;
-      }
-    } else {
-      const found = this.data.processed_updates?.some(u => String(u.update_id) === uid);
-      if (found) {
-        this.recentProcessedUpdates.add(uid);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  async markUpdateProcessed(updateId) {
-    const uid = String(updateId);
-    this.recentProcessedUpdates.add(uid);
-    if (this.recentProcessedUpdates.size > 2500) {
-      const first = this.recentProcessedUpdates.values().next().value;
-      this.recentProcessedUpdates.delete(first);
-    }
-    if (this.type === 'firestore') {
-      try {
-        await setDoc(doc(this.firestoreDb, 'processed_updates', uid), {
-          update_id: Number(updateId),
-          processed_at: new Date().toISOString()
-        });
-      } catch {}
-    } else {
-      if (!this.data.processed_updates) this.data.processed_updates = [];
-      this.data.processed_updates.push({ update_id: Number(updateId), processed_at: new Date().toISOString() });
-      if (this.data.processed_updates.length > 3000) {
-        this.data.processed_updates = this.data.processed_updates.slice(-2000);
-      }
-      this.saveFileStore();
-    }
-  }
-
   // --- Admin Methods ---
   async ensureSuperAdmin(telegramId) {
     const tid = String(telegramId);
@@ -401,7 +334,11 @@ class DatabaseEngine {
     const tid = String(admin.telegram_id);
     const payload = { ...admin, telegram_id: tid, updated_at: new Date().toISOString() };
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'admins', tid), payload, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'admins', tid), payload, { merge: true });
+      } catch (e) {
+        console.error('Error saving admin to firestore:', e.message);
+      }
     } else {
       const idx = this.data.admins.findIndex(a => String(a.telegram_id) === tid);
       if (idx >= 0) this.data.admins[idx] = { ...this.data.admins[idx], ...payload };
@@ -415,7 +352,9 @@ class DatabaseEngine {
   async deleteAdmin(telegramId) {
     const tid = String(telegramId);
     if (this.type === 'firestore') {
-      await deleteDoc(doc(this.firestoreDb, 'admins', tid));
+      try {
+        await deleteDoc(doc(this.firestoreDb, 'admins', tid));
+      } catch {}
     } else {
       this.data.admins = this.data.admins.filter(a => String(a.telegram_id) !== tid);
       this.saveFileStore();
@@ -438,7 +377,9 @@ class DatabaseEngine {
       last_active_at: new Date().toISOString()
     };
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'users', tid), payload, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'users', tid), payload, { merge: true });
+      } catch {}
     } else {
       const idx = this.data.users.findIndex(u => String(u.telegram_id) === tid);
       if (idx >= 0) this.data.users[idx] = { ...this.data.users[idx], ...payload };
@@ -478,7 +419,9 @@ class DatabaseEngine {
   async setUserBlocked(telegramId, isBlocked) {
     const tid = String(telegramId);
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'users', tid), { is_blocked: Boolean(isBlocked) }, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'users', tid), { is_blocked: Boolean(isBlocked) }, { merge: true });
+      } catch {}
     } else {
       const user = this.data.users?.find(u => String(u.telegram_id) === tid);
       if (user) {
@@ -534,7 +477,9 @@ class DatabaseEngine {
     product.created_at = product.created_at || new Date().toISOString();
 
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'products', String(product.id)), product, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'products', String(product.id)), product, { merge: true });
+      } catch {}
     } else {
       const idx = this.data.products.findIndex(p => String(p.id) === String(product.id));
       if (idx >= 0) this.data.products[idx] = { ...this.data.products[idx], ...product };
@@ -548,7 +493,9 @@ class DatabaseEngine {
   async deleteProduct(id) {
     const pid = String(id);
     if (this.type === 'firestore') {
-      await deleteDoc(doc(this.firestoreDb, 'products', pid));
+      try {
+        await deleteDoc(doc(this.firestoreDb, 'products', pid));
+      } catch {}
     } else {
       this.data.products = this.data.products.filter(p => String(p.id) !== pid);
       this.saveFileStore();
@@ -601,7 +548,9 @@ class DatabaseEngine {
     service.created_at = service.created_at || new Date().toISOString();
 
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'services', String(service.id)), service, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'services', String(service.id)), service, { merge: true });
+      } catch {}
     } else {
       const idx = this.data.services.findIndex(s => String(s.id) === String(service.id));
       if (idx >= 0) this.data.services[idx] = { ...this.data.services[idx], ...service };
@@ -615,7 +564,9 @@ class DatabaseEngine {
   async deleteService(id) {
     const sid = String(id);
     if (this.type === 'firestore') {
-      await deleteDoc(doc(this.firestoreDb, 'services', sid));
+      try {
+        await deleteDoc(doc(this.firestoreDb, 'services', sid));
+      } catch {}
     } else {
       this.data.services = this.data.services.filter(s => String(s.id) !== sid);
       this.saveFileStore();
@@ -643,26 +594,15 @@ class DatabaseEngine {
     return activeOnly ? list.filter(o => o.is_active) : list;
   }
 
-  async getEarningOpportunity(id) {
-    const oid = String(id);
-    if (this.type === 'firestore') {
-      try {
-        const snap = await getDoc(doc(this.firestoreDb, 'earning_opportunities', oid));
-        return snap.exists() ? snap.data() : null;
-      } catch {
-        return null;
-      }
-    }
-    return this.data.earning_opportunities?.find(o => String(o.id) === oid) || null;
-  }
-
   async saveEarningOpportunity(opportunity) {
     if (!opportunity.id) opportunity.id = 'earn_' + Date.now();
     opportunity.is_active = opportunity.is_active ?? true;
     opportunity.created_at = opportunity.created_at || new Date().toISOString();
 
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'earning_opportunities', String(opportunity.id)), opportunity, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'earning_opportunities', String(opportunity.id)), opportunity, { merge: true });
+      } catch {}
     } else {
       const idx = this.data.earning_opportunities.findIndex(o => String(o.id) === String(opportunity.id));
       if (idx >= 0) this.data.earning_opportunities[idx] = { ...this.data.earning_opportunities[idx], ...opportunity };
@@ -671,17 +611,6 @@ class DatabaseEngine {
     }
     this.invalidateCache('earning_opportunities');
     return opportunity;
-  }
-
-  async deleteEarningOpportunity(id) {
-    const oid = String(id);
-    if (this.type === 'firestore') {
-      await deleteDoc(doc(this.firestoreDb, 'earning_opportunities', oid));
-    } else {
-      this.data.earning_opportunities = this.data.earning_opportunities.filter(o => String(o.id) !== oid);
-      this.saveFileStore();
-    }
-    this.invalidateCache('earning_opportunities');
   }
 
   // --- Coupons Methods ---
@@ -703,19 +632,6 @@ class DatabaseEngine {
     return activeOnly ? list.filter(c => c.is_active) : list;
   }
 
-  async getCoupon(code) {
-    const cCode = String(code).toUpperCase().trim();
-    if (this.type === 'firestore') {
-      try {
-        const snap = await getDoc(doc(this.firestoreDb, 'coupons', cCode));
-        return snap.exists() ? snap.data() : null;
-      } catch {
-        return null;
-      }
-    }
-    return this.data.coupons?.find(c => String(c.code).toUpperCase() === cCode) || null;
-  }
-
   async saveCoupon(coupon) {
     const cCode = String(coupon.code).toUpperCase().trim();
     const payload = {
@@ -726,7 +642,9 @@ class DatabaseEngine {
       created_at: coupon.created_at || new Date().toISOString()
     };
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'coupons', cCode), payload, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'coupons', cCode), payload, { merge: true });
+      } catch {}
     } else {
       const idx = this.data.coupons.findIndex(c => String(c.code).toUpperCase() === cCode);
       if (idx >= 0) this.data.coupons[idx] = { ...this.data.coupons[idx], ...payload };
@@ -735,17 +653,6 @@ class DatabaseEngine {
     }
     this.invalidateCache('coupons');
     return payload;
-  }
-
-  async deleteCoupon(code) {
-    const cCode = String(code).toUpperCase().trim();
-    if (this.type === 'firestore') {
-      await deleteDoc(doc(this.firestoreDb, 'coupons', cCode));
-    } else {
-      this.data.coupons = this.data.coupons.filter(c => String(c.code).toUpperCase() !== cCode);
-      this.saveFileStore();
-    }
-    this.invalidateCache('coupons');
   }
 
   // --- Orders Methods ---
@@ -760,7 +667,9 @@ class DatabaseEngine {
     order.discount = Number(order.discount || 0);
 
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'orders', String(order.id)), order, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'orders', String(order.id)), order, { merge: true });
+      } catch {}
     } else {
       const idx = this.data.orders.findIndex(o => String(o.id) === String(order.id));
       if (idx >= 0) this.data.orders[idx] = order;
@@ -802,25 +711,6 @@ class DatabaseEngine {
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
 
-  async getOrders(limitCount = 50, status = null) {
-    if (this.type === 'firestore') {
-      try {
-        let q = collection(this.firestoreDb, 'orders');
-        if (status) q = query(q, where('status', '==', status));
-        const snap = await getDocs(q);
-        const list = [];
-        snap.forEach(d => list.push(d.data()));
-        list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-        return list.slice(0, limitCount);
-      } catch {
-        return [];
-      }
-    }
-    let list = this.data.orders || [];
-    if (status) list = list.filter(o => o.status === status);
-    return [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, limitCount);
-  }
-
   async updateOrderStatus(id, status, deliveryInfo = '') {
     const oid = String(id);
     const order = await this.getOrder(oid);
@@ -830,7 +720,9 @@ class DatabaseEngine {
     if (deliveryInfo) updates.delivery_info = deliveryInfo;
 
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'orders', oid), updates, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'orders', oid), updates, { merge: true });
+      } catch {}
     } else {
       const idx = this.data.orders.findIndex(o => String(o.id) === oid);
       if (idx >= 0) this.data.orders[idx] = { ...this.data.orders[idx], ...updates };
@@ -847,7 +739,9 @@ class DatabaseEngine {
       updated_at: new Date().toISOString()
     };
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'orders', oid), updates, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'orders', oid), updates, { merge: true });
+      } catch {}
     } else {
       const idx = this.data.orders.findIndex(o => String(o.id) === oid);
       if (idx >= 0) this.data.orders[idx] = { ...this.data.orders[idx], ...updates };
@@ -864,77 +758,14 @@ class DatabaseEngine {
     payment.amount = Number(payment.amount);
 
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'payments', String(payment.id)), payment, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'payments', String(payment.id)), payment, { merge: true });
+      } catch {}
     } else {
       this.data.payments.push(payment);
       this.saveFileStore();
     }
     return payment;
-  }
-
-  async getPayment(id) {
-    const pid = String(id);
-    if (this.type === 'firestore') {
-      try {
-        const snap = await getDoc(doc(this.firestoreDb, 'payments', pid));
-        return snap.exists() ? snap.data() : null;
-      } catch {
-        return null;
-      }
-    }
-    return this.data.payments?.find(p => String(p.id) === pid) || null;
-  }
-
-  async getPaymentByOrder(orderId) {
-    const oid = String(orderId);
-    if (this.type === 'firestore') {
-      try {
-        const q = query(collection(this.firestoreDb, 'payments'), where('order_id', '==', oid), firestoreLimit(1));
-        const snap = await getDocs(q);
-        let found = null;
-        snap.forEach(d => { found = d.data(); });
-        return found;
-      } catch {
-        return null;
-      }
-    }
-    return this.data.payments?.find(p => String(p.order_id) === oid) || null;
-  }
-
-  async getPayments(status = null) {
-    if (this.type === 'firestore') {
-      try {
-        let q = collection(this.firestoreDb, 'payments');
-        if (status) q = query(q, where('status', '==', status));
-        const snap = await getDocs(q);
-        const list = [];
-        snap.forEach(d => list.push(d.data()));
-        list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-        return list;
-      } catch {
-        return [];
-      }
-    }
-    let list = this.data.payments || [];
-    if (status) list = list.filter(p => p.status === status);
-    return [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  }
-
-  async updatePaymentStatus(id, status, adminNote = '') {
-    const pid = String(id);
-    const updates = { status, admin_note: adminNote, reviewed_at: new Date().toISOString() };
-    if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'payments', pid), updates, { merge: true });
-    } else {
-      const payment = this.data.payments?.find(p => String(p.id) === pid);
-      if (payment) {
-        payment.status = status;
-        payment.admin_note = adminNote;
-        payment.reviewed_at = new Date().toISOString();
-        this.saveFileStore();
-      }
-    }
-    return await this.getPayment(pid);
   }
 
   // --- Support Tickets Methods ---
@@ -947,25 +778,14 @@ class DatabaseEngine {
     ticket.updated_at = new Date().toISOString();
 
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'support_tickets', String(ticket.id)), ticket);
+      try {
+        await setDoc(doc(this.firestoreDb, 'support_tickets', String(ticket.id)), ticket);
+      } catch {}
     } else {
       this.data.support_tickets.push(ticket);
       this.saveFileStore();
     }
     return ticket;
-  }
-
-  async getSupportTicket(id) {
-    const tid = String(id);
-    if (this.type === 'firestore') {
-      try {
-        const snap = await getDoc(doc(this.firestoreDb, 'support_tickets', tid));
-        return snap.exists() ? snap.data() : null;
-      } catch {
-        return null;
-      }
-    }
-    return this.data.support_tickets?.find(t => String(t.id) === tid) || null;
   }
 
   async getUserSupportTickets(telegramId) {
@@ -983,69 +803,6 @@ class DatabaseEngine {
       }
     }
     return (this.data.support_tickets || []).filter(t => String(t.user_telegram_id) === tid);
-  }
-
-  async getSupportTickets(status = null) {
-    if (this.type === 'firestore') {
-      try {
-        let q = collection(this.firestoreDb, 'support_tickets');
-        if (status) q = query(q, where('status', '==', status));
-        const snap = await getDocs(q);
-        const list = [];
-        snap.forEach(d => list.push(d.data()));
-        list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-        return list;
-      } catch {
-        return [];
-      }
-    }
-    let list = this.data.support_tickets || [];
-    if (status) list = list.filter(t => t.status === status);
-    return [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  }
-
-  async addTicketMessage(ticketId, senderOrMessage, maybeText) {
-    const tid = String(ticketId);
-    const ticket = await this.getSupportTicket(tid);
-    if (!ticket) return null;
-
-    let msgObj;
-    let newStatus = ticket.status;
-    if (typeof senderOrMessage === 'string' && maybeText !== undefined) {
-      msgObj = { sender: senderOrMessage, text: maybeText, timestamp: new Date().toISOString() };
-      if (senderOrMessage === 'admin') newStatus = 'answered';
-    } else if (typeof senderOrMessage === 'object' && senderOrMessage !== null) {
-      msgObj = { ...senderOrMessage, timestamp: senderOrMessage.timestamp || new Date().toISOString() };
-      if (senderOrMessage.sender === 'admin') newStatus = 'answered';
-    } else {
-      msgObj = { text: String(senderOrMessage), timestamp: new Date().toISOString() };
-    }
-
-    const msgs = Array.isArray(ticket.messages) ? ticket.messages : [];
-    msgs.push(msgObj);
-
-    const updates = { messages: msgs, status: newStatus, updated_at: new Date().toISOString() };
-    if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'support_tickets', tid), updates, { merge: true });
-    } else {
-      const idx = this.data.support_tickets.findIndex(t => String(t.id) === tid);
-      if (idx >= 0) this.data.support_tickets[idx] = { ...this.data.support_tickets[idx], ...updates };
-      this.saveFileStore();
-    }
-    return { ...ticket, ...updates };
-  }
-
-  async updateTicketStatus(ticketId, status) {
-    const tid = String(ticketId);
-    const updates = { status, updated_at: new Date().toISOString() };
-    if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'support_tickets', tid), updates, { merge: true });
-    } else {
-      const idx = this.data.support_tickets.findIndex(t => String(t.id) === tid);
-      if (idx >= 0) this.data.support_tickets[idx] = { ...this.data.support_tickets[idx], ...updates };
-      this.saveFileStore();
-    }
-    return await this.getSupportTicket(tid);
   }
 
   // --- Settings Methods ---
@@ -1071,7 +828,9 @@ class DatabaseEngine {
   async saveSettings(settings) {
     const payload = { ...settings, updated_at: new Date().toISOString() };
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'settings', 'global_config'), payload, { merge: true });
+      try {
+        await setDoc(doc(this.firestoreDb, 'settings', 'global_config'), payload, { merge: true });
+      } catch {}
     } else {
       this.data.settings = { ...this.data.settings, ...payload };
       this.saveFileStore();
@@ -1097,34 +856,6 @@ class DatabaseEngine {
     }
     const list = this.data.force_channels || [];
     return activeOnly ? list.filter(c => c.is_active) : list;
-  }
-
-  async saveForceChannel(channel) {
-    if (!channel.id) channel.id = 'fc_' + Date.now();
-    channel.is_active = channel.is_active ?? true;
-    channel.created_at = channel.created_at || new Date().toISOString();
-
-    if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'force_channels', String(channel.id)), channel, { merge: true });
-    } else {
-      const idx = this.data.force_channels.findIndex(c => String(c.id) === String(channel.id));
-      if (idx >= 0) this.data.force_channels[idx] = { ...this.data.force_channels[idx], ...channel };
-      else this.data.force_channels.push(channel);
-      this.saveFileStore();
-    }
-    this.invalidateCache('force_channels');
-    return channel;
-  }
-
-  async deleteForceChannel(id) {
-    const cid = String(id);
-    if (this.type === 'firestore') {
-      await deleteDoc(doc(this.firestoreDb, 'force_channels', cid));
-    } else {
-      this.data.force_channels = this.data.force_channels.filter(c => String(c.id) !== cid);
-      this.saveFileStore();
-    }
-    this.invalidateCache('force_channels');
   }
 
   // --- Referrals & Affiliate Methods ---
@@ -1157,7 +888,9 @@ class DatabaseEngine {
     };
 
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'referrals', referralDoc.id), referralDoc);
+      try {
+        await setDoc(doc(this.firestoreDb, 'referrals', referralDoc.id), referralDoc);
+      } catch {}
     } else {
       if (!this.data.referrals) this.data.referrals = [];
       this.data.referrals.push(referralDoc);
@@ -1165,38 +898,6 @@ class DatabaseEngine {
     }
 
     return { success: true, reward, newBalance, referrerId: refId };
-  }
-
-  async recordReferralCommission(referrerId, referredId, orderId, orderNumber, amount) {
-    const refId = String(referrerId);
-    const referrer = await this.getUser(refId);
-    if (!referrer) return null;
-
-    const commissionAmt = Number(amount);
-    const newBalance = Number(referrer.withdrawable_balance || 0) + commissionAmt;
-
-    await this.upsertUser({ telegram_id: refId, withdrawable_balance: newBalance });
-
-    const referralDoc = {
-      id: 'ref_comm_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-      referrer_id: refId,
-      referred_id: String(referredId),
-      type: 'commission',
-      amount: commissionAmt,
-      order_id: String(orderId),
-      order_number: String(orderNumber),
-      created_at: new Date().toISOString()
-    };
-
-    if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'referrals', referralDoc.id), referralDoc);
-    } else {
-      if (!this.data.referrals) this.data.referrals = [];
-      this.data.referrals.push(referralDoc);
-      this.saveFileStore();
-    }
-
-    return { success: true, commissionAmt, newBalance, referrerId: refId };
   }
 
   async getReferrals(referrerId) {
@@ -1241,7 +942,9 @@ class DatabaseEngine {
     };
 
     if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'withdrawals', withdrawal.id), withdrawal);
+      try {
+        await setDoc(doc(this.firestoreDb, 'withdrawals', withdrawal.id), withdrawal);
+      } catch {}
     } else {
       if (!this.data.withdrawals) this.data.withdrawals = [];
       this.data.withdrawals.push(withdrawal);
@@ -1250,93 +953,31 @@ class DatabaseEngine {
     return withdrawal;
   }
 
-  async getWithdrawals(status = null) {
-    if (this.type === 'firestore') {
-      try {
-        let q = collection(this.firestoreDb, 'withdrawals');
-        if (status) q = query(q, where('status', '==', status));
-        const snap = await getDocs(q);
-        const list = [];
-        snap.forEach(d => list.push(d.data()));
-        list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-        return list;
-      } catch {
-        return [];
-      }
-    }
-    let list = this.data.withdrawals || [];
-    if (status) list = list.filter(w => w.status === status);
-    return [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  }
-
-  async getWithdrawal(id) {
-    const wid = String(id);
-    if (this.type === 'firestore') {
-      try {
-        const snap = await getDoc(doc(this.firestoreDb, 'withdrawals', wid));
-        return snap.exists() ? snap.data() : null;
-      } catch {
-        return null;
-      }
-    }
-    return this.data.withdrawals?.find(w => String(w.id) === wid) || null;
-  }
-
-  async updateWithdrawalStatus(id, status, reason = '') {
-    const wid = String(id);
-    const withdrawal = await this.getWithdrawal(wid);
-    if (!withdrawal) return null;
-
-    if (status === 'rejected' && withdrawal.status === 'pending') {
-      const user = await this.getUser(withdrawal.user_telegram_id);
-      if (user) {
-        const refunded = Number(user.withdrawable_balance || 0) + Number(withdrawal.amount);
-        await this.upsertUser({ telegram_id: user.telegram_id, withdrawable_balance: refunded });
-      }
-    }
-
-    const updates = { status, admin_reason: reason, reviewed_at: new Date().toISOString() };
-    if (this.type === 'firestore') {
-      await setDoc(doc(this.firestoreDb, 'withdrawals', wid), updates, { merge: true });
-    } else {
-      const idx = this.data.withdrawals.findIndex(w => String(w.id) === wid);
-      if (idx >= 0) this.data.withdrawals[idx] = { ...this.data.withdrawals[idx], ...updates };
-      this.saveFileStore();
-    }
-    return { ...withdrawal, ...updates };
-  }
-
   async getDashboardStats() {
-    const [users, orders, payments, products, services] = await Promise.all([
-      this.getUsers(),
-      this.getOrders(500),
-      this.getPayments(),
-      this.getProducts(),
-      this.getServices()
-    ]);
+    try {
+      const [users, orders, products, services] = await Promise.all([
+        this.getUsers(),
+        this.getUserOrders(''),
+        this.getProducts(),
+        this.getServices()
+      ]);
 
-    const completedOrders = orders.filter(o => o.status === 'completed');
-    const totalSales = completedOrders.reduce((sum, o) => sum + Number(o.final_amount || 0), 0);
-    const pendingOrders = orders.filter(o => o.status === 'pending').length;
-    const pendingPayments = payments.filter(p => p.status === 'pending').length;
-
-    return {
-      totalUsers: users.length,
-      totalOrders: orders.length,
-      completedOrders: completedOrders.length,
-      totalSales,
-      pendingOrders,
-      pendingPayments,
-      totalProducts: products.length,
-      totalServices: services.length
-    };
+      return {
+        totalUsers: users.length,
+        totalOrders: orders.length,
+        totalProducts: products.length,
+        totalServices: services.length
+      };
+    } catch {
+      return { totalUsers: 0, totalOrders: 0, totalProducts: 0, totalServices: 0 };
+    }
   }
 }
 
 export const db = new DatabaseEngine();
 
 // ==========================================
-// 4. UI & KEYBOARD BUILDERS
+// 4. TELEGRAM KEYBOARDS & UI HELPERS
 // ==========================================
 export const keyboards = {
   fullMenu(isAdmin = false) {
@@ -1408,10 +1049,6 @@ export const keyboards = {
           { text: '👥 My Referrals', style: 'primary' },
           { text: '💸 Withdraw', style: 'success' }
         ],
-        [
-          { text: '📊 Earnings History', style: 'primary' },
-          { text: 'ℹ️ How It Works', style: 'primary' }
-        ],
         [{ text: '🔙 Back', style: 'primary' }]
       ],
       resize_keyboard: true
@@ -1425,46 +1062,19 @@ export const keyboards = {
     };
   },
 
-  aiReplyActions() {
+  adminReplyMenu() {
     return {
-      inline_keyboard: [[{ text: '🔙 Exit AI Assistant', callback_data: 'ai:exit' }]]
+      keyboard: [
+        [
+          { text: '📊 Dashboard', style: 'primary' },
+          { text: '🗂️ Products', style: 'primary' }
+        ],
+        [
+          { text: '🔙 Back to User Menu', style: 'danger' }
+        ]
+      ],
+      resize_keyboard: true
     };
-  },
-
-  adminReplyMenu(isSuperAdmin = false) {
-    const keyboard = [
-      [
-        { text: '📊 Dashboard', style: 'primary' },
-        { text: '🗂️ Products', style: 'primary' },
-        { text: '🧑💻 Services', style: 'primary' }
-      ],
-      [
-        { text: '💰 Earnings', style: 'success' },
-        { text: '🎁 Offers', style: 'success' },
-        { text: '📦 Orders', style: 'primary' }
-      ],
-      [
-        { text: '💳 Payments', style: 'primary' },
-        { text: '👥 Users', style: 'primary' },
-        { text: '🎫 Support', style: 'primary' }
-      ],
-      [
-        { text: '📢 Broadcast', style: 'primary' },
-        { text: '📈 Analytics', style: 'primary' },
-        { text: '📢 Force Channels', style: 'primary' }
-      ],
-      [
-        { text: '💸 Withdrawals', style: 'success' }
-      ]
-    ];
-    if (isSuperAdmin) {
-      keyboard.push([{ text: '👑 Admin Management', style: 'danger' }]);
-    }
-    keyboard.push([
-      { text: '⚙️ Settings', style: 'primary' },
-      { text: '🔙 Back to User Menu', style: 'danger' }
-    ]);
-    return { keyboard, resize_keyboard: true };
   },
 
   productListInline(products) {
@@ -1571,7 +1181,7 @@ class AiService {
     this.activeSessions.delete(String(userId));
   }
 
-  async generateAiResponse(userId, prompt, userContext = {}) {
+  async generateAiResponse(userId, prompt) {
     const [products, services, opps, settings] = await Promise.all([
       db.getProducts(true),
       db.getServices(true),
@@ -1579,68 +1189,57 @@ class AiService {
       db.getSettings()
     ]);
 
-    const catalogKnowledge = `
+    if (!this.aiInstance) {
+      // Smart offline fallback
+      const lower = prompt.toLowerCase();
+      if (lower.includes('product') || lower.includes('buy') || lower.includes('toolkit')) {
+        return { text: `🛍️ *VYRON Products:*\n\n` + products.map(p => `• *${p.name}* — ₹${p.price}\n  _${p.description}_`).join('\n\n') + `\n\nTap *🛍️ Products* in the menu to purchase!` };
+      }
+      if (lower.includes('service') || lower.includes('bot') || lower.includes('setup')) {
+        return { text: `🧑💻 *Business Services:*\n\n` + services.map(s => `• *${s.name}* — ₹${s.price}\n  _${s.description}_`).join('\n\n') + `\n\nTap *🧑💻 Services* to order!` };
+      }
+      if (lower.includes('earn') || lower.includes('refer') || lower.includes('money')) {
+        return { text: `💰 *Affiliate Program:*\n\n• Get *₹2 instant bonus* per friend referral.\n• Earn *20% commission* on all purchases.\n\nTap *💰 Earn Money* to get your link!` };
+      }
+      return { text: `🤖 *VYRON AI Assistant:*\n\nI can help you explore products, custom Telegram bot engineering, and affiliate income programs.\n\nHow can I help you today?` };
+    }
+
+    try {
+      const catalogKnowledge = `
 VYRON BUSINESS INFO:
 About: ${settings.about_text || 'Premium business services, digital products, and earning programs.'}
-UPI ID for payments: ${settings.upi_id || 'business@upi'} (${settings.receiver_name || 'VYRON Business'})
+UPI ID: ${settings.upi_id || 'business@upi'} (${settings.receiver_name || 'VYRON Business'})
 
 Available Products:
 ${products.map(p => `- ${p.name} (₹${p.price}): ${p.description}`).join('\n') || 'None'}
 
 Available Services:
 ${services.map(s => `- ${s.name} (₹${s.price}) [Turnaround: ${s.delivery_time || '24-48h'}]: ${s.description}`).join('\n') || 'None'}
-
-Earning Opportunities:
-${opps.map(o => `- ${o.name}: ${o.reward_info} - ${o.how_to_earn}`).join('\n') || 'None'}
 `;
-
-    if (!this.aiInstance) {
-      // Smart offline fallback assistant
-      const lower = prompt.toLowerCase();
-      if (lower.includes('product') || lower.includes('buy') || lower.includes('toolkit') || lower.includes('book')) {
-        return { text: `🛍️ *VYRON Catalog Products:*\n\n` + products.map(p => `• *${p.name}* — ₹${p.price}\n  _${p.description}_`).join('\n\n') + `\n\nTap *🛍️ Products* in the menu to order!` };
-      }
-      if (lower.includes('service') || lower.includes('bot') || lower.includes('custom') || lower.includes('setup')) {
-        return { text: `🧑💻 *Professional Business Services:*\n\n` + services.map(s => `• *${s.name}* — ₹${s.price}\n  _${s.description}_`).join('\n\n') + `\n\nTap *🧑💻 Services* in the menu to book!` };
-      }
-      if (lower.includes('earn') || lower.includes('refer') || lower.includes('money') || lower.includes('commission')) {
-        return { text: `💰 *Earn Money with VYRON:*\n\n• Get *₹2 instant bonus* for every invited member.\n• Earn *20% lifetime commission* on all purchases.\n• Request payout anytime to UPI.\n\nTap *💰 Earn Money* to grab your link!` };
-      }
-      return { text: `🤖 *VYRON AI Assistant:*\n\nI can help you explore our products, custom Telegram bot services, referral earnings, and orders.\n\nType your question or choose an option from the main menu below!` };
-    }
-
-    try {
-      const systemInstruction = `You are VYRON AI, the friendly, professional, and concise customer assistant for VYRON Business.
-Answer customer queries accurately using the provided catalog information.
-Keep responses concise, polite, beautifully formatted with Telegram Markdown, and guide them on how to order or earn.
-${catalogKnowledge}`;
 
       const response = await this.aiInstance.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,
         config: {
-          systemInstruction,
+          systemInstruction: `You are VYRON AI, the friendly customer assistant for VYRON Business. Keep responses concise, formatted with Telegram Markdown.\n${catalogKnowledge}`,
           temperature: 0.7,
-          maxOutputTokens: 500
+          maxOutputTokens: 400
         }
       });
 
       return { text: response.text || 'How else can I assist you with VYRON services today?' };
     } catch (err) {
-      console.warn('⚠️ Gemini generation error:', err.message);
-      return { text: `🤖 *VYRON AI Assistant:*\n\nWe offer premium business toolkits, custom Telegram bot engineering, and affiliate income programs.\n\nHow can I help you today?` };
+      console.warn('⚠️ Gemini generation fallback:', err.message);
+      return { text: `🤖 *VYRON AI Assistant:*\n\nWe offer digital toolkits, custom Telegram bot engineering, and affiliate earnings.\n\nHow can I assist you today?` };
     }
   }
 }
 const aiService = new AiService();
 
 // ==========================================
-// 7. GRAMMY TELEGRAM BOT FACTORY
+// 7. GRAMMY TELEGRAM BOT SETUP (POLLING MODE)
 // ==========================================
-let botInstance = null;
-
-export function initTelegramBot() {
-  if (botInstance) return botInstance;
+export function createTelegramBot() {
   if (!config.telegramBotToken) {
     console.warn('⚠️ [Bot] TELEGRAM_BOT_TOKEN is not configured yet.');
     return null;
@@ -1648,10 +1247,12 @@ export function initTelegramBot() {
 
   const bot = new Bot(config.telegramBotToken);
 
-  // Global safe error handler inside grammY
+  // Global error handler in grammY
   bot.catch((err) => {
-    const ctx = err.ctx;
-    console.error(`💥 [grammY] Error handling update ${ctx?.update?.update_id || 'unknown'}:`, err.error?.message || err.message);
+    console.error('Bot error caught:', {
+      update_id: err.ctx?.update?.update_id,
+      error: err.error?.message || err.message
+    });
   });
 
   // Force channels validator
@@ -1679,11 +1280,7 @@ export function initTelegramBot() {
     }
   };
 
-  // ----------------------------------------
-  // BOT COMMANDS & HANDLERS
-  // ----------------------------------------
-
-  // /start
+  // Commands
   bot.command('start', async (ctx) => {
     try {
       const from = ctx.from;
@@ -1737,7 +1334,6 @@ export function initTelegramBot() {
     }
   });
 
-  // /menu
   bot.command('menu', async (ctx) => {
     try {
       const admin = await db.getAdmin(ctx.from.id);
@@ -1750,18 +1346,17 @@ export function initTelegramBot() {
     }
   });
 
-  // /orders
   bot.command('orders', async (ctx) => {
     try {
       const orders = await db.getUserOrders(ctx.from.id);
       if (orders.length === 0) {
-        return ctx.reply('📦 You have no active orders yet. Browse *🛍️ Products* or *🧑💻 Services* to place your first order!', {
+        return ctx.reply('📦 You have no active orders yet. Browse *🛍️ Products* or *🧑💻 Services* to place an order!', {
           parse_mode: 'Markdown'
         });
       }
       let msg = `📦 *Your Recent Orders (${orders.length}):*\n\n`;
       orders.slice(0, 5).forEach((o, i) => {
-        const statusEmoji = o.status === 'completed' ? '✅' : o.status === 'processing' ? '⚙️' : '⏳';
+        const statusEmoji = o.status === 'completed' ? '✅' : '⏳';
         msg += `${i + 1}. *${o.item_name}*\n   🆔 \`${o.order_number}\` | 💵 ₹${o.final_amount} | ${statusEmoji} *${o.status.toUpperCase()}*\n\n`;
       });
       await ctx.reply(msg, { parse_mode: 'Markdown' });
@@ -1770,7 +1365,6 @@ export function initTelegramBot() {
     }
   });
 
-  // /ai
   bot.command('ai', async (ctx) => {
     try {
       stateManager.clear(ctx.from.id);
@@ -1784,7 +1378,6 @@ export function initTelegramBot() {
     }
   });
 
-  // /account
   bot.command('account', async (ctx) => {
     try {
       const user = await db.getUser(ctx.from.id);
@@ -1797,8 +1390,7 @@ export function initTelegramBot() {
         `👤 *Name:* ${ctx.from.first_name || 'Member'}\n` +
         `💰 *Wallet Balance:* ₹${Number(user?.withdrawable_balance || 0).toFixed(2)}\n` +
         `👥 *Referrals:* ${referrals.length}\n` +
-        `📦 *Total Orders:* ${orders.length}\n` +
-        `📅 *Joined:* ${user?.joined_at ? new Date(user.joined_at).toLocaleDateString() : 'Today'}`;
+        `📦 *Total Orders:* ${orders.length}`;
 
       await ctx.reply(msg, { parse_mode: 'Markdown' });
     } catch (e) {
@@ -1806,7 +1398,6 @@ export function initTelegramBot() {
     }
   });
 
-  // /support
   bot.command('support', async (ctx) => {
     try {
       await ctx.reply(
@@ -1818,36 +1409,29 @@ export function initTelegramBot() {
     }
   });
 
-  // /admin
   bot.command('admin', async (ctx) => {
     try {
       const admin = await db.getAdmin(ctx.from.id);
       if (!admin) {
         return ctx.reply('⛔ *Access Denied:* You do not have administrator permissions.', { parse_mode: 'Markdown' });
       }
-      const isSuper = admin.role === 'super_admin' || String(ctx.from.id) === String(config.initialSuperAdminId);
       const stats = await db.getDashboardStats();
-
       const msg =
-        `⚙️ *VYRON Executive Admin Control Panel*\n\n` +
+        `⚙️ *VYRON Admin Control Panel*\n\n` +
         `👑 *Role:* ${admin.role?.toUpperCase() || 'ADMIN'}\n` +
         `👥 *Users:* ${stats.totalUsers} | 📦 *Orders:* ${stats.totalOrders}\n` +
-        `⏳ *Pending Orders:* ${stats.pendingOrders} | 💳 *Pending Payments:* ${stats.pendingPayments}\n` +
-        `💵 *Total Revenue:* ₹${stats.totalSales}\n\n` +
-        `Select an administrative module below:`;
+        `🛍️ *Products:* ${stats.totalProducts} | 🧑💻 *Services:* ${stats.totalServices}`;
 
       await ctx.reply(msg, {
         parse_mode: 'Markdown',
-        reply_markup: keyboards.adminReplyMenu(isSuper)
+        reply_markup: keyboards.adminReplyMenu()
       });
     } catch (e) {
       console.error('Error in /admin:', e.message);
     }
   });
 
-  // ----------------------------------------
-  // MESSAGE TEXT & BOTTOM KEYBOARDS ROUTER
-  // ----------------------------------------
+  // Message router
   bot.on(['message:text', 'message:photo'], async (ctx) => {
     try {
       const fromId = ctx.from?.id;
@@ -1861,13 +1445,13 @@ export function initTelegramBot() {
       const text = ctx.message.text ? ctx.message.text.trim() : '';
       const photo = ctx.message.photo ? ctx.message.photo[ctx.message.photo.length - 1] : null;
 
-      // Handle Bottom Reply Keyboard Clicks
+      // Bottom Keyboards
       if (text === '🛍️ Products') {
         stateManager.clear(fromId);
         aiService.exitAiSession(fromId);
         const products = await db.getProducts(true);
         if (products.length === 0) return ctx.reply('🛍️ No products currently in catalog.');
-        return ctx.reply('🛍️ *Select a Product to View Details:*', {
+        return ctx.reply('🛍️ *Select a Product:*', {
           parse_mode: 'Markdown',
           reply_markup: keyboards.productListInline(products)
         });
@@ -1878,13 +1462,13 @@ export function initTelegramBot() {
         aiService.exitAiSession(fromId);
         const services = await db.getServices(true);
         if (services.length === 0) return ctx.reply('🧑💻 No services currently listed.');
-        return ctx.reply('🧑💻 *Select a Professional Service:*', {
+        return ctx.reply('🧑💻 *Select a Service:*', {
           parse_mode: 'Markdown',
           reply_markup: keyboards.serviceListInline(services)
         });
       }
 
-      if (text === '💰 Earn Money' || text === '💰 My Earnings' || text === '💰 Balance') {
+      if (text === '💰 Earn Money' || text === '💰 Balance') {
         stateManager.clear(fromId);
         aiService.exitAiSession(fromId);
         const me = await db.getUser(fromId);
@@ -1916,29 +1500,28 @@ export function initTelegramBot() {
         const me = await db.getUser(fromId);
         const bal = Number(me?.withdrawable_balance || 0);
         if (bal < 50) {
-          return ctx.reply(`⚠️ Minimum withdrawal amount is *₹50.00*. Your current balance is *₹${bal.toFixed(2)}*. Keep sharing your referral link!`, {
+          return ctx.reply(`⚠️ Minimum withdrawal amount is *₹50.00*. Your balance is *₹${bal.toFixed(2)}*.`, {
             parse_mode: 'Markdown'
           });
         }
         stateManager.set(fromId, { step: 'awaiting_withdrawal_details', balance: bal });
-        return ctx.reply(`💸 *Request Payout (Balance: ₹${bal.toFixed(2)})*\n\nPlease reply with your *UPI ID* or *Bank Transfer Details* (e.g., \`username@upi\`):`, {
+        return ctx.reply(`💸 *Request Payout (Balance: ₹${bal.toFixed(2)})*\n\nPlease reply with your *UPI ID* (e.g. \`name@upi\`):`, {
           parse_mode: 'Markdown'
         });
       }
 
-      if (text === '🎁 Offers' || text === '🎁 Active Coupons') {
+      if (text === '🎁 Offers') {
         const coupons = await db.getCoupons(true);
-        if (coupons.length === 0) return ctx.reply('🎁 No promotional coupons currently active.');
+        if (coupons.length === 0) return ctx.reply('🎁 No coupons currently active.');
         let msg = `🎁 *Active Discount Coupons:*\n\n`;
         coupons.forEach(c => {
           const discount = c.discount_type === 'percent' ? `${c.discount_value}% OFF` : `₹${c.discount_value} OFF`;
           msg += `🎟️ Code: \`${c.code}\` — *${discount}*\n   _${c.description}_\n\n`;
         });
-        msg += `Apply coupon codes during checkout!`;
         return ctx.reply(msg, { parse_mode: 'Markdown' });
       }
 
-      if (text === '📦 Orders' || text === '📦 My Orders') {
+      if (text === '📦 Orders') {
         const orders = await db.getUserOrders(fromId);
         if (orders.length === 0) return ctx.reply('📦 You have no orders yet.');
         let msg = `📦 *Your Order History:*\n\n`;
@@ -1948,7 +1531,7 @@ export function initTelegramBot() {
         return ctx.reply(msg, { parse_mode: 'Markdown' });
       }
 
-      if (text === '👤 Account' || text === '👤 My Account') {
+      if (text === '👤 Account') {
         const me = await db.getUser(fromId);
         const orders = await db.getUserOrders(fromId);
         const msg =
@@ -1969,7 +1552,7 @@ export function initTelegramBot() {
 
       if (text === '➕ Create Ticket') {
         stateManager.set(fromId, { step: 'awaiting_ticket_subject' });
-        return ctx.reply('✍️ Please type a brief description or message for your support ticket:');
+        return ctx.reply('✍️ Please type a brief description for your support ticket:');
       }
 
       if (text === '📋 My Tickets') {
@@ -1987,11 +1570,11 @@ export function initTelegramBot() {
         return ctx.reply(settings.about_text || '🌟 VYRON Business Automation Bot.', { parse_mode: 'Markdown' });
       }
 
-      if (text === '🤖 AI ASSISTANT' || text === '🤖 AI Assistant') {
+      if (text === '🤖 AI ASSISTANT') {
         stateManager.clear(fromId);
         aiService.startAiSession(fromId);
         return ctx.reply(
-          '🤖 *Welcome to VYRON Business AI*\n\nI am your automated business assistant. Ask me anything about our products, custom Telegram bot engineering, or referral earnings!',
+          '🤖 *Welcome to VYRON Business AI*\n\nI am your automated business assistant. Ask me anything about our products, Telegram bots, or referral earnings!',
           { parse_mode: 'Markdown', reply_markup: keyboards.aiReplyMenu() }
         );
       }
@@ -2012,39 +1595,27 @@ export function initTelegramBot() {
         });
       }
 
-      // ----------------------------------------
-      // Active AI Conversation Mode Handling
-      // ----------------------------------------
+      // AI Conversation Mode
       if (aiService.isAiActive(fromId) && text) {
         await ctx.replyWithChatAction('typing');
-        const aiResponse = await aiService.generateAiResponse(fromId, text, {
-          username: ctx.from.username,
-          first_name: ctx.from.first_name
-        });
-        return ctx.reply(aiResponse.text, {
-          parse_mode: 'Markdown',
-          reply_markup: keyboards.aiReplyActions()
-        }).catch(() => {
-          return ctx.reply(aiResponse.text, { reply_markup: keyboards.aiReplyActions() });
+        const aiResponse = await aiService.generateAiResponse(fromId, text);
+        return ctx.reply(aiResponse.text, { parse_mode: 'Markdown' }).catch(() => {
+          return ctx.reply(aiResponse.text);
         });
       }
 
-      // ----------------------------------------
-      // State Machine Handlers (Multi-step forms)
-      // ----------------------------------------
+      // State Machine
       const state = stateManager.get(fromId);
       if (state) {
-        // 1. Withdrawal Submission
         if (state.step === 'awaiting_withdrawal_details' && text) {
           stateManager.clear(fromId);
           const withdrawal = await db.createWithdrawal(fromId, ctx.from.first_name, state.balance, text);
-          return ctx.reply(`✅ *Withdrawal Request Submitted!*\n\nAmount: *₹${withdrawal.amount.toFixed(2)}*\nPayout Details: \`${text}\`\n\nOur team will process your payout within 24 hours.`, {
+          return ctx.reply(`✅ *Withdrawal Request Submitted!*\n\nAmount: *₹${withdrawal.amount.toFixed(2)}*\nPayout Details: \`${text}\``, {
             parse_mode: 'Markdown',
             reply_markup: keyboards.fullMenu()
           });
         }
 
-        // 2. Ticket Creation
         if (state.step === 'awaiting_ticket_subject' && text) {
           stateManager.clear(fromId);
           const ticket = await db.createSupportTicket({
@@ -2053,20 +1624,19 @@ export function initTelegramBot() {
             subject: text,
             messages: [{ sender: 'user', text, timestamp: new Date().toISOString() }]
           });
-          return ctx.reply(`✅ *Ticket Created!*\n\nTicket Number: \`${ticket.ticket_number}\`\nOur support team will review your inquiry shortly.`, {
+          return ctx.reply(`✅ *Ticket Created!*\n\nTicket Number: \`${ticket.ticket_number}\``, {
             parse_mode: 'Markdown',
             reply_markup: keyboards.supportReplyMenu()
           });
         }
 
-        // 3. Payment Proof Upload
         if (state.step === 'awaiting_payment_proof' && (photo || text)) {
           stateManager.clear(fromId);
           const order = await db.getOrder(state.orderId);
           if (!order) return ctx.reply('⚠️ Order not found.');
 
           const fileId = photo ? photo.file_id : '';
-          const utr = text || 'UTR submitted in image';
+          const utr = text || 'Photo Proof';
 
           await db.updateOrderPaymentProof(order.id, fileId, utr);
           await db.createPayment({
@@ -2078,7 +1648,7 @@ export function initTelegramBot() {
             status: 'pending'
           });
 
-          return ctx.reply(`🎉 *Payment Proof Received!*\n\nOrder #:\`${order.order_number}\`\nOur admin team has been notified and will verify your payment shortly!`, {
+          return ctx.reply(`🎉 *Payment Proof Received!*\n\nOrder #:\`${order.order_number}\`\nWe will review your submission shortly!`, {
             parse_mode: 'Markdown',
             reply_markup: keyboards.fullMenu()
           });
@@ -2089,9 +1659,7 @@ export function initTelegramBot() {
     }
   });
 
-  // ----------------------------------------
-  // INLINE CALLBACK QUERIES ROUTER
-  // ----------------------------------------
+  // Callbacks
   bot.on('callback_query:data', async (ctx) => {
     try {
       const data = ctx.callbackQuery.data;
@@ -2100,17 +1668,11 @@ export function initTelegramBot() {
 
       if (data === 'noop') return;
 
-      if (data === 'ai:exit') {
-        aiService.exitAiSession(fromId);
-        const admin = await db.getAdmin(fromId);
-        return ctx.reply('👋 Exited AI Assistant.', { reply_markup: keyboards.fullMenu(Boolean(admin)) });
-      }
-
       if (data === 'user:check_joined') {
         const hasJoined = await checkForceChannels(ctx);
         if (hasJoined) {
           const admin = await db.getAdmin(fromId);
-          return ctx.reply('✅ *Thank you for joining! Access unlocked.*', {
+          return ctx.reply('✅ *Access unlocked!*', {
             parse_mode: 'Markdown',
             reply_markup: keyboards.fullMenu(Boolean(admin))
           });
@@ -2149,7 +1711,7 @@ export function initTelegramBot() {
         const sid = data.replace('user:service:', '');
         const srv = await db.getService(sid);
         if (!srv) return ctx.reply('⚠️ Service not found.');
-        const text = `🧑💻 *${srv.name}*\n\n💵 *Price:* ₹${srv.price}\n⏱️ *Turnaround:* ${srv.delivery_time || '24-48h'}\n\n📝 *Description:*\n${srv.description}\n\n📋 *Requirements:* ${srv.requirements || 'Standard'}`;
+        const text = `🧑💻 *${srv.name}*\n\n💵 *Price:* ₹${srv.price}\n⏱️ *Turnaround:* ${srv.delivery_time || '24-48h'}\n\n📝 *Description:*\n${srv.description}`;
         return ctx.editMessageText(text, {
           parse_mode: 'Markdown',
           reply_markup: keyboards.serviceDetailInline(srv)
@@ -2183,7 +1745,7 @@ export function initTelegramBot() {
           `💳 *Payment Details:*\n` +
           `• *UPI ID:* \`${settings.upi_id || 'business@upi'}\`\n` +
           `• *Recipient:* ${settings.receiver_name || 'VYRON Business'}\n\n` +
-          `Please tap *💳 Submit Payment Proof* once paid:`;
+          `Tap *💳 Submit Payment Proof* once paid:`;
 
         return ctx.reply(msg, {
           parse_mode: 'Markdown',
@@ -2218,7 +1780,7 @@ export function initTelegramBot() {
           `💳 *Payment Details:*\n` +
           `• *UPI ID:* \`${settings.upi_id || 'business@upi'}\`\n` +
           `• *Recipient:* ${settings.receiver_name || 'VYRON Business'}\n\n` +
-          `Tap *💳 Submit Payment Proof* after completing transaction:`;
+          `Tap *💳 Submit Payment Proof* once paid:`;
 
         return ctx.reply(msg, {
           parse_mode: 'Markdown',
@@ -2242,267 +1804,127 @@ export function initTelegramBot() {
     }
   });
 
-  botInstance = bot;
-  return botInstance;
+  return bot;
 }
 
 // ==========================================
-// 8. EXPRESS SERVER INITIALIZATION
+// 8. ROBUST RECONNECTING POLLING RUNNER
 // ==========================================
-const app = express();
-app.use(express.json());
+let activeBot = null;
 
-let isReady = false;
-let botInfo = null;
-let activeMode = 'initializing';
-
-// ------------------------------------------
-// Webhook Endpoint (POST /api/telegram-webhook & /webhook & /)
-// ------------------------------------------
-const handleIncomingTelegramWebhook = async (req, res) => {
-  // 1. Secret Token Security Validation
-  if (config.webhookSecret) {
-    const secret = req.headers['x-telegram-bot-api-secret-token'];
-    if (secret !== config.webhookSecret) {
-      console.warn('⛔ [Webhook] Invalid secret token received');
-      return res.status(403).json({ error: 'Unauthorized' });
-    }
-  }
-
-  const update = req.body;
-  if (!update || !update.update_id) {
-    return res.status(400).send('Bad Request: Missing update_id');
-  }
-
-  // 2. CRITICAL: Return 200 OK IMMEDIATELY to Telegram so webhook never times out
-  res.status(200).json({ ok: true });
-
-  // 3. Process the update asynchronously in the background
-  setImmediate(async () => {
-    try {
-      const alreadyHandled = await db.isUpdateProcessed(update.update_id);
-      if (alreadyHandled) return;
-
-      await db.markUpdateProcessed(update.update_id);
-      const bot = initTelegramBot();
-      if (bot) {
-        await bot.handleUpdate(update);
-      }
-    } catch (err) {
-      console.error(`❌ [Webhook-Async] Error handling update ${update.update_id}:`, err.message);
-    }
-  });
-};
-
-app.post('/api/telegram-webhook', handleIncomingTelegramWebhook);
-app.post('/webhook', handleIncomingTelegramWebhook);
-app.post('/', (req, res, next) => {
-  if (req.body && req.body.update_id) return handleIncomingTelegramWebhook(req, res);
-  next();
-});
-
-// ------------------------------------------
-// 9. KEEP-ALIVE HEALTH ENDPOINT (GET /health)
-// ------------------------------------------
-app.get('/health', async (req, res) => {
-  const mem = process.memoryUsage();
-  const isDbConnected = db.isInitialized;
-  const isHealthy = isReady && isDbConnected;
-
-  res.status(isHealthy ? 200 : 503).json({
-    status: isHealthy ? 'ok' : 'degraded',
-    bot: botInfo ? `@${botInfo.username}` : 'pending_credentials',
-    database: isDbConnected ? db.type : 'connecting',
-    uptime: Math.floor(process.uptime()),
-    timestamp: new Date().toISOString(),
-    memory: {
-      rss: `${Math.round(mem.rss / 1024 / 1024)}MB`,
-      heapUsed: `${Math.round(mem.heapUsed / 1024 / 1024)}MB`
-    },
-    mode: activeMode,
-    appUrl: config.appUrl || 'auto-detected'
-  });
-});
-
-app.get('/api/status', async (req, res) => {
-  const stats = await db.getDashboardStats();
-  res.json({
-    status: 'online',
-    botInfo,
-    databaseType: db.type,
-    stats,
-    appUrl: config.appUrl
-  });
-});
-
-// ------------------------------------------
-// Operational UI Dashboard (GET /)
-// ------------------------------------------
-app.get('/', async (req, res) => {
-  const stats = await db.getDashboardStats();
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VYRON Business Bot - 24/7 Production Controller</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased p-6 md:p-12">
-  <div class="max-w-4xl mx-auto space-y-6">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800 pb-6 gap-4">
-      <div class="flex items-center gap-3">
-        <span class="text-4xl">🤖</span>
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight text-white">VYRON Business Bot</h1>
-          <p class="text-slate-400 text-sm">24/7 Crash-Proof Webhook Server & Engine</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="px-3 py-1 rounded-full text-xs font-semibold ${botInfo ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">
-          ● ${botInfo ? 'Bot Online (@' + botInfo.username + ')' : 'Connecting Bot'}
-        </span>
-        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-950 text-blue-400 border border-blue-800">
-          DB: ${db.type.toUpperCase()}
-        </span>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <div class="text-slate-400 text-xs">Registered Members</div>
-        <div class="text-2xl font-bold text-white mt-1">${stats.totalUsers}</div>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <div class="text-slate-400 text-xs">Total Orders</div>
-        <div class="text-2xl font-bold text-white mt-1">${stats.totalOrders}</div>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <div class="text-slate-400 text-xs">Pending Review</div>
-        <div class="text-2xl font-bold text-amber-400 mt-1">${stats.pendingOrders + stats.pendingPayments}</div>
-      </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <div class="text-slate-400 text-xs">Gross Revenue</div>
-        <div class="text-2xl font-bold text-emerald-400 mt-1">₹${stats.totalSales}</div>
-      </div>
-    </div>
-
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-3">
-      <h2 class="text-lg font-semibold text-white">⚡ Keep-Alive & Webhook Status</h2>
-      <p class="text-xs text-slate-400 leading-relaxed">
-        Immediate 200 OK responses prevent Telegram webhook timeouts, while the 10-minute self-ping heartbeat guarantees continuous 24/7 uptime on cloud providers.
-      </p>
-      <div class="pt-2 flex gap-3">
-        <a href="/health" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition-colors">
-          Inspect /health Endpoint
-        </a>
-      </div>
-    </div>
-  </div>
-</body>
-</html>`;
-  res.send(html);
-});
-
-// ==========================================
-// 10. AUTOMATIC KEEP-ALIVE SELF-PING HEARTBEAT
-// ==========================================
-function setupKeepAliveHeartbeat(port) {
-  const INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
-
-  setInterval(() => {
-    try {
-      const localUrl = `http://127.0.0.1:${port}/health`;
-      http.get(localUrl, (res) => {
-        res.resume();
-      }).on('error', (e) => {
-        // Safe keep-alive silent catch
-      });
-
-      // If public URL is set, ping public endpoint to wake host proxy
-      if (config.appUrl && config.appUrl.startsWith('https://') && !config.appUrl.includes('localhost')) {
-        https.get(`${config.appUrl}/health`, (res) => {
-          res.resume();
-        }).on('error', () => {});
-      }
-    } catch (e) {
-      // Safe catch
-    }
-  }, INTERVAL_MS);
-
-  console.log('⏰ [Keep-Alive] Self-ping heartbeat scheduled every 10 minutes.');
-}
-
-// ==========================================
-// 11. BOOTSTRAP & STARTUP
-// ==========================================
-async function startServer() {
-  console.log('🚀 [Server] Starting VYRON Business Bot production server...');
+async function startLongPolling() {
+  console.log('🚀 [Engine] Bootstrapping VYRON Business Bot in Long Polling mode...');
   await db.init();
 
-  const bot = initTelegramBot();
-  if (bot) {
-    try {
-      await bot.init();
-      botInfo = bot.botInfo;
-      console.log(`🤖 [Telegram] Bot Authenticated: @${botInfo.username} (${botInfo.first_name})`);
+  const bot = createTelegramBot();
+  if (!bot) {
+    console.log('ℹ️ Bot token missing. Set TELEGRAM_BOT_TOKEN to start polling.');
+    return;
+  }
+  activeBot = bot;
 
-      // Set official Telegram Bot Menu & Commands
-      try {
-        await bot.api.setMyCommands([
-          { command: 'start', description: '🏠 Open VYRON Main Menu' },
-          { command: 'menu', description: '📱 Navigation Menu' },
-          { command: 'orders', description: '📦 My Orders & Tracking' },
-          { command: 'ai', description: '🤖 VYRON AI Assistant' },
-          { command: 'account', description: '👤 My Account Profile' },
-          { command: 'support', description: '🎫 Customer Support Center' },
-          { command: 'admin', description: '⚙️ Admin Control Panel' }
-        ]);
-        await bot.api.setChatMenuButton({ menu_button: { type: 'commands' } });
-      } catch (cmdErr) {
-        console.warn('⚠️ Could not set bot menu commands:', cmdErr.message);
-      }
-
-      // Check URL and deployment mode
-      const isPublicProductionUrl = config.appUrl &&
-        config.appUrl.startsWith('https://') &&
-        !config.appUrl.includes('localhost') &&
-        !config.appUrl.includes('ais-dev-');
-
-      if (isPublicProductionUrl) {
-        activeMode = 'webhook';
-        const webhookUrl = `${config.appUrl}/api/telegram-webhook`;
-        console.log(`🌐 [Webhook] Registering Telegram Webhook: ${webhookUrl}`);
-        const opts = { drop_pending_updates: false, allowed_updates: ['message', 'callback_query'] };
-        if (config.webhookSecret) opts.secret_token = config.webhookSecret;
-        await bot.api.setWebhook(webhookUrl, opts);
-        console.log('✅ [Webhook] Webhook registered successfully!');
-      } else {
-        // AI Studio dev environment or no public URL yet: enable background polling
-        activeMode = 'polling';
-        console.log('📡 [Polling] Starting interactive polling mode...');
-        bot.start({
-          drop_pending_updates: false,
-          onStart: (info) => console.log(`🚀 [Polling] Bot @${info.username} is polling for updates.`)
-        });
-      }
-    } catch (err) {
-      console.error('⚠️ [Bot] Initialization warning:', err.message);
-    }
-  } else {
-    console.log('ℹ️ [Server] Bot token pending. Provide TELEGRAM_BOT_TOKEN to activate bot.');
+  // Set official commands
+  try {
+    await bot.api.setMyCommands([
+      { command: 'start', description: '🏠 Open VYRON Main Menu' },
+      { command: 'menu', description: '📱 Navigation Menu' },
+      { command: 'orders', description: '📦 My Orders & Tracking' },
+      { command: 'ai', description: '🤖 VYRON AI Assistant' },
+      { command: 'account', description: '👤 My Account Profile' },
+      { command: 'support', description: '🎫 Customer Support Center' },
+      { command: 'admin', description: '⚙️ Admin Control Panel' }
+    ]);
+  } catch (cmdErr) {
+    console.warn('⚠️ Commands setup warning:', cmdErr.message);
   }
 
-  isReady = true;
+  // Delete any lingering webhook and drop pending backlogged updates
+  try {
+    console.log('🧹 [Polling] Clearing webhooks & dropping pending backlogged updates...');
+    await bot.api.deleteWebhook({ drop_pending_updates: true });
+  } catch (whErr) {
+    console.warn('⚠️ Delete webhook warning:', whErr.message);
+  }
 
-  const listenPort = process.env.PORT || config.port || 3000;
-  app.listen(listenPort, '0.0.0.0', () => {
-    console.log(`📡 [Server] VYRON Server listening on port ${listenPort}`);
-    console.log(`🩺 [Health] Health endpoint ready at http://localhost:${listenPort}/health`);
-    setupKeepAliveHeartbeat(listenPort);
-  });
+  // Persistent reconnect loop for long polling
+  let isRunning = true;
+  let retryCount = 0;
+
+  const runPollingLoop = async () => {
+    while (isRunning) {
+      try {
+        console.log('📡 [Polling] Starting long polling with drop_pending_updates: true...');
+        await bot.start({
+          drop_pending_updates: true,
+          allowed_updates: ['message', 'callback_query'],
+          onStart: (botInfo) => {
+            retryCount = 0;
+            console.log(`✅ [Polling] Bot @${botInfo.username} (${botInfo.first_name}) is online and actively polling!`);
+          }
+        });
+      } catch (err) {
+        const errorMsg = err?.message || String(err);
+        const isConflict = errorMsg.includes('409') || errorMsg.includes('Conflict') || err?.error_code === 409;
+
+        // Clean up runner state on failure
+        try {
+          await bot.stop();
+        } catch {}
+
+        if (isConflict) {
+          // If another instance or lingering connection is open, wait 15 seconds for Telegram timeout window to close
+          console.warn('⚠️ [409 Conflict] Telegram reported another getUpdates connection is open. Waiting 15s for the old connection to close before retrying...');
+          await new Promise(r => setTimeout(r, 15000));
+        } else {
+          retryCount++;
+          const backoffMs = Math.min(2000 * Math.pow(1.5, retryCount), 30000);
+          console.error(`⚠️ [Polling Error] Polling interrupted (${errorMsg}). Reconnecting in ${Math.round(backoffMs / 1000)}s...`);
+          await new Promise(r => setTimeout(r, backoffMs));
+        }
+      }
+    }
+  };
+
+  runPollingLoop();
 }
 
-startServer().catch((err) => {
-  console.error('Fatal startup error:', err);
+// Graceful Shutdown
+const shutdown = async (signal) => {
+  console.log(`🛑 [Shutdown] Received ${signal}. Stopping bot cleanly...`);
+  try {
+    if (activeBot) {
+      await activeBot.stop();
+    }
+  } catch {}
+  process.exit(0);
+};
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+
+// Lightweight dummy HTTP server for Render/Cloud Run port-binding requirement
+const port = process.env.PORT || config.port || 3000;
+const server = http.createServer((req, res) => {
+  const url = (req.url || '/').split('?')[0];
+
+  if (url === '/' || url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({
+      status: 'ok',
+      message: 'VYRON Business Bot is running in Long Polling mode',
+      mode: 'long_polling',
+      database: db.type,
+      uptime: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString()
+    }));
+  }
+
+  // Safe 200 OK fallback for any other health probe
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ status: 'ok', path: url }));
+});
+
+server.listen(port, '0.0.0.0', () => {
+  console.log(`🌐 [Render Web Service] HTTP port-binding active on port ${port} (/ and /health ready)`);
+  startLongPolling();
 });

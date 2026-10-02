@@ -18,8 +18,7 @@ export function getBot() {
 
   // Global error handler
   bot.catch((err) => {
-    const ctx = err.ctx;
-    console.error(`Error while handling update ${ctx.update.update_id}:`, err.error);
+    console.error('Bot error caught:', err?.error?.message || err?.message || err);
   });
 
   // Register feature handlers
